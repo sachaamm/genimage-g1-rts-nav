@@ -21,7 +21,7 @@ namespace DefaultNamespace
 
         private void Update()
         {
-  
+            
         }
     }
 }
