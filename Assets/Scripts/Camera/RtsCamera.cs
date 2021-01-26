@@ -6,7 +6,7 @@ public class RtsCamera : MonoBehaviour
 {
     public Vector3 MousePos;
     public float moveSpeed;
-    
+    public float boundy;
     void Start()
     {
         
@@ -14,7 +14,7 @@ public class RtsCamera : MonoBehaviour
 
     
     void Update()
-    {
+    {   
         MousePos = Input.mousePosition;
         float width = Screen.width;
         float height = Screen.height;
@@ -28,7 +28,16 @@ public class RtsCamera : MonoBehaviour
         {
             Scroll(new Vector3(-1, 0, 0));
         }
-
+        if (MousePos.y <= (Screen.height / 10))
+        {
+            Scroll(new Vector3(0, 0, 1));
+        }
+        Debug.Log(boundy);
+        boundy = Screen.height - Screen.height / 10 ;
+        if (MousePos.y >= (Screen.height - Screen.height / 10))
+        {
+            Scroll(new Vector3(0, 0, -1));
+        }
     }
     void Scroll(Vector3 direction)
     {
