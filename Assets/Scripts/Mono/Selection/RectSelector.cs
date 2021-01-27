@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using DefaultNamespace.Actor;
+using DefaultNamespace.Element;
+using Scriptable.Scripts;
 using UnityEngine;
 
 namespace DefaultNamespace.Selection
@@ -41,10 +44,27 @@ namespace DefaultNamespace.Selection
             if (Input.GetMouseButtonUp(0))
             {
                 List<GameObject> unitsInRect = UnitsInRect();
+                List<ActorReference.ElementAction> actionsPossibles = new List<ActorReference.ElementAction>();
+
+                foreach (GameObject selected in unitsInRect)
+                {
+                    ElementIdentity elementIdentity = selected.GetComponent<ElementIdentity>();
+
+                    ElementScriptable elementScriptable =
+                        ElementManager.Singleton.GetElementScriptableForElement(elementIdentity.Element);
+
+                    foreach (ActorReference.ElementAction actionPossiblePourCetElement in elementScriptable.PossibleActions)
+                    {
+                        actionsPossibles.Add(actionPossiblePourCetElement);
+                    }
+                }
+                
                 Debug.Log(unitsInRect.Count);
                 
                 Selection.Singleton.ReceiveSelection(unitsInRect);
                 UiManager.Singleton.UpdateGroupLayout(unitsInRect);
+                UiManager.Singleton.UpdateActionsLayout(actionsPossibles);
+                
             }
             
         }

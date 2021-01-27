@@ -14,15 +14,6 @@ namespace DefaultNamespace
         {
             Singleton = this; // this est le script en question : SelectorManager
         }
-
-        private void Start()
-        {
-            
-        }
-
-        private void Update()
-        {
-            
-        }
+        
     }
 }

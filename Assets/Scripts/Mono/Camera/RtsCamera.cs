@@ -32,7 +32,7 @@ public class RtsCamera : MonoBehaviour
         {
             Scroll(new Vector3(0, 0, 1));
         }
-        Debug.Log(boundy);
+  
         boundy = Screen.height - Screen.height / 10 ;
         if (MousePos.y >= (Screen.height - Screen.height / 10))
         {
