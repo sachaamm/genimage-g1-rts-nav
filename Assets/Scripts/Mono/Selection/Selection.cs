@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace DefaultNamespace.Selection
 {
@@ -48,6 +49,40 @@ namespace DefaultNamespace.Selection
             s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
         }
 
-        
+        private void MoveSelection(Vector3 destination)
+        {
+            foreach (var go in selection)
+            {            
+                NavMeshAgent navMeshAgent = go.GetComponent<NavMeshAgent>();
+                if (navMeshAgent != null)
+                {
+                    navMeshAgent.destination = destination;
+                }                   
+            }
+        }
+        private void Update()
+        {
+            if (Input.GetMouseButtonDown(1))
+            {
+                RaycastHit hit;
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+                Debug.DrawLine(ray.origin, ray.origin + ray.direction * 100, Color.green);
+
+                if (Physics.Raycast(ray, out hit))
+                {
+                    if (hit.collider != null)
+                    {
+                        // Select(hit.collider.gameObject);
+                        MoveSelection(hit.point);
+
+                    }
+                }
+                else
+                {
+                    // if(selected) Unselect(selected);
+                }
+            }
+        }
     }
 }

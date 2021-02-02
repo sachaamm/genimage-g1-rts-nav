@@ -21,22 +21,22 @@ public class RtsCamera : MonoBehaviour
 
         if ( MousePos.x <= (Screen.width / 10) )
         {
-            Scroll(new Vector3(1, 0, 0));
+            Scroll(new Vector3(-1, 0, 0));
         }
 
         if ( MousePos.x >= (Screen.width - Screen.width / 10) )
         {
-            Scroll(new Vector3(-1, 0, 0));
+            Scroll(new Vector3(1, 0, 0));
         }
         if (MousePos.y <= (Screen.height / 10))
         {
-            Scroll(new Vector3(0, 0, 1));
+            Scroll(new Vector3(0, 0, -1));
         }
   
         boundy = Screen.height - Screen.height / 10 ;
         if (MousePos.y >= (Screen.height - Screen.height / 10))
         {
-            Scroll(new Vector3(0, 0, -1));
+            Scroll(new Vector3(0, 0, 1));
         }
     }
     void Scroll(Vector3 direction)
