@@ -39,23 +39,35 @@ using UnityEngine;
                 rectSelector.SetActive(false);
             }
 
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && !Selection.Singleton.mouseOnGUI)
             {
-                List<GameObject> unitsInRect = UnitsInRect();
-                
-                
-                // List<ActorReference.ElementAction> actionsPossibles = new List<ActorReference.ElementAction>();
-                List<ActorReference.ElementWithAction> elementActions = new List<ActorReference.ElementWithAction>();
+                List<Selection.Selected> unitsInRect = UnitsInRect();
 
-                foreach (GameObject selected in unitsInRect)
+                List<ActorReference.ElementWithAction> elementActions = ElementWithActionsFromSelection(unitsInRect);
+                
+                Debug.Log(unitsInRect.Count);
+                
+                Selection.Singleton.ReceiveSelectionOnMouseUp(unitsInRect);
+                UiManager.Singleton.UpdateGroupLayout(unitsInRect);
+                UiManager.Singleton.UpdateActionsLayout(elementActions);
+                
+            }
+            
+        }
+
+        public static List<ActorReference.ElementWithAction> ElementWithActionsFromSelection(List<Selection.Selected> selection)
+        {
+            List<ActorReference.ElementWithAction> elementActions = new List<ActorReference.ElementWithAction>();
+
+                foreach (Selection.Selected selected in selection)
                 {
-                    ElementIdentity elementIdentity = selected.GetComponent<ElementIdentity>();
+                    ElementIdentity elementIdentity = selected.SelectedGameObject.GetComponent<ElementIdentity>();
 
                     ElementScriptable elementScriptable =
                         ElementManager.Singleton.GetElementScriptableForElement(elementIdentity.Element);
 
                     List<GameObject> selectedForActions = new List<GameObject>();
-                    selectedForActions.Add(selected);
+                    selectedForActions.Add(selected.SelectedGameObject);
                     
                     foreach (ActorReference.ElementAction actionPossiblePourCetElement in elementScriptable.PossibleActions)
                     {
@@ -79,24 +91,15 @@ using UnityEngine;
                                     actionPossiblePourCetElement);
 
                             // -> j'ajoute le gameObject a la liste de elementWithAction.ElementsForAction correspondant 
-                            existingElementWithAction.ElementsForAction.Add(selected);
+                            existingElementWithAction.ElementsForAction.Add(selected.SelectedGameObject);
 
                         }
        
                     }
                 }
-                
-                Debug.Log(unitsInRect.Count);
-                
-                Selection.Singleton.ReceiveSelection(unitsInRect);
-                UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(elementActions);
-                
-            }
-            
-        }
 
-        
+                return elementActions;
+        }
         
 
         void DrawRect()
@@ -123,9 +126,9 @@ using UnityEngine;
         }
 
 
-        List<GameObject> UnitsInRect()
+        List<Selection.Selected> UnitsInRect()
         {
-            List<GameObject> unitsInRect = new List<GameObject>();
+            List<Selection.Selected> unitsInRect = new List<Selection.Selected>();
             
             Vector3 screenPosToWorldPoint = RaycastUtility.RaycastPosition();
 
@@ -139,13 +142,37 @@ using UnityEngine;
             {
                 if (InBounds(min, max, child.position))
                 {
-                    unitsInRect.Add(child.gameObject);
+                    AddElementInSelection(child.gameObject, unitsInRect);
                 }
             }
             
             return unitsInRect;
         }
 
+        public List<Selection.Selected> AddElementInSelection(GameObject element, List<Selection.Selected> selection)
+        {
+            ElementIdentity elementIdentity = element.GetComponent<ElementIdentity>();
+            
+            if (ElementReference.IsBuildingElement(elementIdentity.Element))
+            {
+                Selection.BuildingSelected buildingSelected = new Selection.BuildingSelected();
+                buildingSelected.SelectedGameObject = element.gameObject;
+                buildingSelected.SelectedElement = elementIdentity.Element;
+                selection.Add(buildingSelected);
+            }
+                    
+            if (ElementReference.IsUnitElement(elementIdentity.Element))
+            {
+                Selection.UnitSelected unitSelected = new Selection.UnitSelected();
+                unitSelected.SelectedGameObject = element.gameObject;
+                unitSelected.Unit = element.gameObject.GetComponent<Unit>();
+                unitSelected.SelectedElement = elementIdentity.Element;
+                selection.Add(unitSelected);
+            }
+
+            return selection;
+        }
+        
 
         bool InBounds(Vector3 min, Vector3 max, Vector3 pos)
         {

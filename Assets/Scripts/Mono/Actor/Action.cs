@@ -1,5 +1,7 @@
 ﻿
 using DefaultNamespace.Element;
+using Mono.Entity;
+using Mono.UI;
 using Scriptable.Scripts;
 using UnityEngine;
 
@@ -45,12 +47,6 @@ using UnityEngine;
                 InstantAction(elementWithAction);
             }
             
-            
-
-
-           
-
-
         }
 
         // Une action qui s'effectue instantanément
@@ -60,16 +56,27 @@ using UnityEngine;
             
             if (action == ActorReference.ElementAction.CreateWorker)
             {
-                ElementScriptable elementScriptable =
-                    ElementManager.Singleton.GetElementScriptableForElement(ElementReference.Element.Worker);
+                CreateUnitInBuilding(elementWithAction, ElementReference.Element.Worker);
+            }
+            
+            if (action == ActorReference.ElementAction.CreateSoldier)
+            {
+                CreateUnitInBuilding(elementWithAction, ElementReference.Element.Soldier);
+            }
+            
+            
+        }
 
-                foreach (GameObject element in elementWithAction.ElementsForAction)
-                {
-                    Vector3 spawnPos = element.transform.position;
+        void CreateUnitInBuilding(ActorReference.ElementWithAction elementWithAction, ElementReference.Element element)
+        {
+            ElementScriptable elementScriptable =
+                ElementManager.Singleton.GetElementScriptableForElement(element);
+
+            foreach (GameObject go in elementWithAction.ElementsForAction)
+            {
+                Vector3 spawnPos = go.transform.position;
                 
-                    ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, spawnPos);
-                }
-                
+                ElementManager.Singleton.InstantiateElement(element, spawnPos);
             }
         }
 
@@ -91,8 +98,20 @@ using UnityEngine;
                 {
                     if (hit.collider != null)
                     {
+
+                        if (HoveredTargetManager.Singleton.target == null)
+                        {
+                            Selection.Singleton.MoveSelection(hit.point);
+                        }
+                        else
+                        {
+                            EntityReference.Entity targetType = HoveredTargetManager.Singleton.targetType;
+
+                            DefineActionForElements();
+
+                        }
                         // Select(hit.collider.gameObject);
-                        Selection.Singleton.MoveSelection(hit.point);
+                        
 
                     }
                 }
@@ -102,6 +121,40 @@ using UnityEngine;
                 }
             }
 
+        }
+
+        void DefineActionForElements()
+        {
+            foreach (Selection.Selected selected in Selection.Singleton.selection)
+            {
+                if (selected.GetType() == typeof(Selection.UnitSelected))
+                {
+                    Selection.UnitSelected unitSelected = selected as Selection.UnitSelected;
+                    ElementReference.Element unit = unitSelected.SelectedElement;
+
+                    if (unit == ElementReference.Element.Soldier)
+                    {
+                        
+                    }
+
+                    if (unit == ElementReference.Element.Worker)
+                    {
+                        if (HoveredTargetManager.Singleton.targetType == EntityReference.Entity.Resource)
+                        {
+                            // 
+                            unitSelected.Unit.TargetPoint = HoveredTargetManager.Singleton.target.transform.position;
+                            unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToResource);
+                            
+                        }
+                    }
+
+                }
+
+                if (selected.GetType() == typeof(Selection.BuildingSelected))
+                {
+                    
+                }
+            }
         }
         
         void PrepareToCreateBuilding()

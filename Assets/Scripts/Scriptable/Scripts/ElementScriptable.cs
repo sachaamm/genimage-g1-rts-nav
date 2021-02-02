@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace Scriptable.Scripts
 {
-    [CreateAssetMenu(fileName = "FILENAME", menuName = "Element", order = 0)]
+    // [CreateAssetMenu(fileName = "FILENAME", menuName = "RtsTuto/Element", order = 0)]
     public class ElementScriptable : UnityEngine.ScriptableObject
     {
         public GameObject Prefab;
         public List<ActorReference.ElementAction> PossibleActions;
         public int MaxHealth = 100;
-        public bool IsMovable = false;
-        public Mesh ElementShape;
+        public Sprite Icon;
+
     }
 }

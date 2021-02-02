@@ -8,7 +8,14 @@
         {
             CreateWorker,
             CreateBuilding,
-            None
+            None,
+            CreateSoldier,
+            Attack,
+            MoveToEnemy,
+            MoveToPoint,
+            MoveToResource,
+            BringBackResource,
+            SeekClosestResource,
         }
         
         public class ElementWithAction

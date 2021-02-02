@@ -16,22 +16,48 @@ public class Selection : MonoBehaviour
 
     public static Selection Singleton;
 
-    public List<GameObject> selection;
+    public List<Selected> selection = new List<Selected>();
 
     public GameObject houseGhostPrefab;
     private GameObject houseGhost;
+
+    public class Selected
+    {
+        public GameObject SelectedGameObject;
+        public ElementReference.Element SelectedElement;
+    }
+
+    public class UnitSelected : Selected
+    {
+        public Unit Unit;
+    }
+
+    public class BuildingSelected : Selected
+    {
+        // public 
+    }
     
     private void Awake()
     {
         Singleton = this;
     }
+    
+    
 
-    public void ReceiveSelection(List<GameObject> s)
+    public void ReceiveSelectionOnMouseUp(List<Selected> s)
     {
         if (mouseOnGUI)
         {
             return;
         }
+
+        UpdateSelection(s);
+    }
+
+    
+    
+    public void UpdateSelection(List<Selected> s)
+    {
         foreach (var go in selection)
         {
             Unselect(go);
@@ -45,25 +71,34 @@ public class Selection : MonoBehaviour
         }
     }
 
-    void Unselect(GameObject s)
+    void Unselect(Selected s)
     {
-        s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
+        s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
     }
     
-    void Select(GameObject s)
+    void Select(Selected s)
     {
-        s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
+        s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
     }
 
     public void MoveSelection(Vector3 destination)
     {
-        foreach (var go in selection)
+        foreach (var selected in selection)
         {
-            NavMeshAgent navMeshAgent = go.GetComponent<NavMeshAgent>();
-            if (navMeshAgent != null)
+            if (selected.GetType() == typeof(UnitSelected))
             {
-                navMeshAgent.destination = destination;
+                var unitSelected = selected as UnitSelected;
+                unitSelected.Unit.TargetPoint = destination;
+                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint);
+                
             }
+            
+            // TODO
+            // NavMeshAgent navMeshAgent = selected.SelectedGameObject.GetComponent<NavMeshAgent>();
+            // if (navMeshAgent != null)
+            // {
+            //     navMeshAgent.destination = destination;
+            // }
         }
     }
     
