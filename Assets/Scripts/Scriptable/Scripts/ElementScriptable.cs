@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using DefaultNamespace.Actor;
 using UnityEngine;
 
 namespace Scriptable.Scripts
@@ -11,7 +10,6 @@ namespace Scriptable.Scripts
         public List<ActorReference.ElementAction> PossibleActions;
         public int MaxHealth = 100;
         public bool IsMovable = false;
-        
-
+        public Mesh ElementShape;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
-using DefaultNamespace.Actor;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -39,14 +38,17 @@ public class UiManager : MonoBehaviour
         }
     }
 
-    public void UpdateActionsLayout(List<ActorReference.ElementAction> elementActions)
+
+
+    public void UpdateActionsLayout(List<ActorReference.ElementWithAction> elementActions)
     {
         ResetActionsLayout();
 
-        foreach (var action in elementActions)
+        foreach (ActorReference.ElementWithAction elementWithAction in elementActions)
         {
             GameObject go = Instantiate(actionElementPrefab, actionsGridLayoutParent);
-            go.GetComponentInChildren<Text>().text = action.ToString();
+            go.GetComponentInChildren<Text>().text = elementWithAction.ElementAction.ToString();
+            go.GetComponent<ActionElementButton>().elementWithAction = elementWithAction;
         }
     }
 

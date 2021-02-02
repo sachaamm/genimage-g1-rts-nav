@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DefaultNamespace.Actor;
 using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
@@ -26,7 +25,7 @@ using UnityEngine;
             {
                 startMousePos = Input.mousePosition;
                 
-                startMouseWorldPos = RaycastPosition();
+                startMouseWorldPos = RaycastUtility.RaycastPosition();
                 
             }
             
@@ -43,7 +42,10 @@ using UnityEngine;
             if (Input.GetMouseButtonUp(0))
             {
                 List<GameObject> unitsInRect = UnitsInRect();
-                List<ActorReference.ElementAction> actionsPossibles = new List<ActorReference.ElementAction>();
+                
+                
+                // List<ActorReference.ElementAction> actionsPossibles = new List<ActorReference.ElementAction>();
+                List<ActorReference.ElementWithAction> elementActions = new List<ActorReference.ElementWithAction>();
 
                 foreach (GameObject selected in unitsInRect)
                 {
@@ -52,9 +54,35 @@ using UnityEngine;
                     ElementScriptable elementScriptable =
                         ElementManager.Singleton.GetElementScriptableForElement(elementIdentity.Element);
 
+                    List<GameObject> selectedForActions = new List<GameObject>();
+                    selectedForActions.Add(selected);
+                    
                     foreach (ActorReference.ElementAction actionPossiblePourCetElement in elementScriptable.PossibleActions)
                     {
-                        actionsPossibles.Add(actionPossiblePourCetElement);
+                        ActorReference.ElementWithAction elementWithAction = new ActorReference.ElementWithAction();
+                        elementWithAction.ElementAction = actionPossiblePourCetElement;
+                        elementWithAction.ElementsForAction = selectedForActions;
+                        
+                        // si cette action de type ElementAction n'est pas deja présente dans la liste "elementsAction",
+                        
+                        if (!ActorReference.ElementWithActionListAlreadyContainsElementAction(elementActions, actionPossiblePourCetElement))
+                        {
+                            // -> je l'ajoute
+                            elementActions.Add(elementWithAction);
+                        }
+                        else // si cette action de type ElementAction est présente dans la liste "elementsAction",
+                        {
+                            // je récupére l'objet correspondant dans la liste
+
+                            ActorReference.ElementWithAction existingElementWithAction =
+                                ActorReference.GetElementWithActionForElementActionInList(elementActions,
+                                    actionPossiblePourCetElement);
+
+                            // -> j'ajoute le gameObject a la liste de elementWithAction.ElementsForAction correspondant 
+                            existingElementWithAction.ElementsForAction.Add(selected);
+
+                        }
+       
                     }
                 }
                 
@@ -62,31 +90,14 @@ using UnityEngine;
                 
                 Selection.Singleton.ReceiveSelection(unitsInRect);
                 UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(actionsPossibles);
+                UiManager.Singleton.UpdateActionsLayout(elementActions);
                 
             }
             
         }
 
-        Vector3 RaycastPosition()
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            Debug.DrawLine(ray.origin, ray.origin + ray.direction * 100, Color.green);
-            
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (hit.collider != null)
-                {
-                    // Select(hit.collider.gameObject);
-                    // Ind(hit.point, "start");
-                    return hit.point;
-                }
-            }
-
-            return new Vector3();
-        }
+        
+        
 
         void DrawRect()
         {
@@ -116,7 +127,7 @@ using UnityEngine;
         {
             List<GameObject> unitsInRect = new List<GameObject>();
             
-            Vector3 screenPosToWorldPoint = RaycastPosition();
+            Vector3 screenPosToWorldPoint = RaycastUtility.RaycastPosition();
 
             // le point minimum entre screenPosToWorldPoint et startMouseWorldPos
             // le point maximum entre screenPosToWorldPoint et startMouseWorldPos

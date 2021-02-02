@@ -3,8 +3,6 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
-using static DefaultNamespace.Actor.ActorReference;
-
 
 public class Selection : MonoBehaviour
 {
@@ -12,7 +10,7 @@ public class Selection : MonoBehaviour
 
     // et on affichera les informations de l'élément sur le GUI 
 
-    public ElementAction currentAction = ElementAction.None;
+    
 
     public bool mouseOnGUI = false;
 
@@ -20,6 +18,9 @@ public class Selection : MonoBehaviour
 
     public List<GameObject> selection;
 
+    public GameObject houseGhostPrefab;
+    private GameObject houseGhost;
+    
     private void Awake()
     {
         Singleton = this;
@@ -48,14 +49,13 @@ public class Selection : MonoBehaviour
     {
         s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
     }
-
-
+    
     void Select(GameObject s)
     {
         s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
     }
 
-    private void MoveSelection(Vector3 destination)
+    public void MoveSelection(Vector3 destination)
     {
         foreach (var go in selection)
         {
@@ -66,29 +66,5 @@ public class Selection : MonoBehaviour
             }
         }
     }
-    private void Update()
-    {
-        if (Input.GetMouseButtonDown(1))
-        {
-            RaycastHit hit;
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-
-            Debug.DrawLine(ray.origin, ray.origin + ray.direction * 100, Color.green);
-
-            if (Physics.Raycast(ray, out hit))
-            {
-                if (hit.collider != null)
-                {
-                    // Select(hit.collider.gameObject);
-                    MoveSelection(hit.point);
-
-                }
-            }
-            else
-            {
-                // if(selected) Unselect(selected);
-            }
-        }
-
-    }
+    
 }
