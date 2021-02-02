@@ -5,8 +5,7 @@ using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
 
-namespace DefaultNamespace.Selection
-{
+
     public class RectSelector : MonoBehaviour
     {
         public GameObject rectSelector;
@@ -145,4 +144,3 @@ namespace DefaultNamespace.Selection
 
         
     }
-}

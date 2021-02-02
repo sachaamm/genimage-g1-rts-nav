@@ -5,7 +5,8 @@
         public enum ElementAction
         {
             CreateWorker,
-            CreateBuilding
+            CreateBuilding,
+            None
         }
     }
 }
