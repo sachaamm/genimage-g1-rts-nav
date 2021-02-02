@@ -9,6 +9,7 @@ namespace Scriptable.Scripts
     {
         public GameObject Prefab;
         public List<ActorReference.ElementAction> PossibleActions;
+        public int MaxHealth = 100;
         public bool IsMovable = false;
         
 

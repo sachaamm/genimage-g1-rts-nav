@@ -39,13 +39,13 @@ namespace DefaultNamespace.Selection
 
         void Unselect(GameObject s)
         {
-            s.GetComponent<MeshRenderer>().material = SelectorManager.Singleton.DefaultMaterial;
+            s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
         }
         
         
         void Select(GameObject s)
         {
-            s.GetComponent<MeshRenderer>().material = SelectorManager.Singleton.SelectedMaterial;
+            s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
         }
 
         

@@ -3,9 +3,9 @@ using UnityEngine;
 
 namespace DefaultNamespace
 {
-    public class SelectorManager : MonoBehaviour
+    public class MaterialManager : MonoBehaviour
     {
-        public static SelectorManager Singleton; // Un Singleton est un objet qui est instantié une seule fois !
+        public static MaterialManager Singleton; // Un Singleton est un objet qui est instantié une seule fois !
 
         public Material SelectedMaterial;
         public Material DefaultMaterial;

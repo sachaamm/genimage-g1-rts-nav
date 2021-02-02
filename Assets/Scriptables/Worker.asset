@@ -14,4 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 8037120971659100910, guid: 899402d89c6a0ee4a9adcc7a35f94761, type: 3}
   PossibleActions: 01000000
+  MaxHealth: 50
   IsMovable: 1

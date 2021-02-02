@@ -40,10 +40,6 @@ public class RaycastExample : MonoBehaviour
             }
         }
         
-            
-            
-            
-        
     }
 
     void SetPlayerDestination(Vector3 point)
@@ -63,7 +59,7 @@ public class RaycastExample : MonoBehaviour
         // on enregistre le matériau initial du gameobject selectionné pour l'utiliser plus tard
         selectedInitMaterial = s.GetComponent<MeshRenderer>().material;
         // je change le materiau de son mesh renderer
-        s.GetComponent<MeshRenderer>().material = SelectorManager.Singleton.SelectedMaterial;
+        s.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
 
     }
 
