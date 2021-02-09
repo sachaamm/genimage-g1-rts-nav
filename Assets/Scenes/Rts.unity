@@ -2272,12 +2272,13 @@ MonoBehaviour:
       elementIcon: {fileID: 0}
     reqReferences: {fileID: 0}
     isExpanded: 1
-    _keyValues: 010000000000000002000000
-    _keys: 010000000000000002000000
+    _keyValues: 01000000000000000200000003000000
+    _keys: 01000000000000000200000003000000
     _values:
     - {fileID: 11400000, guid: 994ff72d29636494ebb1f333a49e8558, type: 2}
     - {fileID: 11400000, guid: 2f43e17592af5d44392072fa9ce27dd3, type: 2}
     - {fileID: 11400000, guid: 7969cf05b8798b14cbb5c6ad99a696ae, type: 2}
+    - {fileID: 11400000, guid: 91732d0b76702384d92f09200d6e7fbe, type: 2}
   prefabIndicator: {fileID: 8933763911862665439, guid: bc004488f85968c45baee39a625b6d5c,
     type: 3}
   debugActorCanvasPrefab: {fileID: 8282391670799389232, guid: d91c1ea53e6c1fc48a5d047449d6f654,
