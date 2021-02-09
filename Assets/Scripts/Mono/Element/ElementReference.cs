@@ -1,6 +1,7 @@
 ﻿
     public class ElementReference
     {
+        // Les différents Element
         public enum Element
         {
             House,
@@ -8,6 +9,7 @@
             Soldier
         }
 
+        // Définir si un élement est constructible 
         public static bool IsBuildingElement(Element element)
         {
             if (element == Element.House) return true;
@@ -15,7 +17,7 @@
             return false;
         }
 
-
+        // Définir si un élement est une unité
         public static bool IsUnitElement(Element element)
         {
             if (element == Element.Worker) return true;

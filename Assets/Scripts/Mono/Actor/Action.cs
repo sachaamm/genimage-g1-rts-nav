@@ -5,7 +5,10 @@ using Mono.UI;
 using Scriptable.Scripts;
 using UnityEngine;
 
-    public class Action : MonoBehaviour
+/// <summary>
+/// Script executant les actions disponibles de la selection active( exemple : Construire un batiment / une unité )
+/// </summary>
+public class Action : MonoBehaviour
     {
         public static Action Singleton;
 
@@ -30,6 +33,7 @@ using UnityEngine;
         
         }
 
+        // Quand je clique sur un bouton d'ElementAction, j'appelle la fonction InterpretAction qui me permet de définir l'action à effectuer
         public void InterpretAction(ActorReference.ElementWithAction elementWithAction)
         {
             bool preparingAction = false; // preparingAction = une action en 2 temps ( ex: CreateBuilding ) 
@@ -67,6 +71,7 @@ using UnityEngine;
             
         }
 
+        // Permet à un batiment de créer des unités
         void CreateUnitInBuilding(ActorReference.ElementWithAction elementWithAction, ElementReference.Element element)
         {
             ElementScriptable elementScriptable =
@@ -80,11 +85,13 @@ using UnityEngine;
             }
         }
 
+        // Si l'ElementAction est une action de préparation ( ex: avant de Creer un batiment, il y a une phase ou on le positionne sur la map )
         bool IsPreparingAction(ActorReference.ElementAction action)
         {
             return action == ActorReference.ElementAction.CreateBuilding;
         }
 
+        // je déplace les unités de la selection avec le clic droit 
         void MoveUnits()
         {
             if (Input.GetMouseButtonDown(1))
@@ -98,21 +105,16 @@ using UnityEngine;
                 {
                     if (hit.collider != null)
                     {
-
                         if (HoveredTargetManager.Singleton.target == null)
                         {
                             Selection.Singleton.MoveSelection(hit.point);
                         }
                         else
                         {
+                            // comme j'ai right click sur un élément, je ne me déplace pas mais je définis l'action à effectuer en fonction de l'Element
                             EntityReference.Entity targetType = HoveredTargetManager.Singleton.targetType;
-
                             DefineActionForElements();
-
                         }
-                        // Select(hit.collider.gameObject);
-                        
-
                     }
                 }
                 else
@@ -123,10 +125,13 @@ using UnityEngine;
 
         }
 
+        // Définir l'action possible pour l'Element, selon si c'est une Unité ou pas, quel type d'unité etc
         void DefineActionForElements()
         {
+            // sur la liste des elements selectionnés (Selected)
             foreach (Selection.Selected selected in Selection.Singleton.selection)
             {
+                // si l'élément selectionné est de type Unité (UnitSelected)
                 if (selected.GetType() == typeof(Selection.UnitSelected))
                 {
                     Selection.UnitSelected unitSelected = selected as Selection.UnitSelected;
@@ -139,12 +144,12 @@ using UnityEngine;
 
                     if (unit == ElementReference.Element.Worker)
                     {
+                        // les éléments Worker peuvent cibler les ressources
                         if (HoveredTargetManager.Singleton.targetType == EntityReference.Entity.Resource)
                         {
-                            // 
+                            // on définit l'action de l'ouvrier à "MoveToRessource"
                             unitSelected.Unit.TargetPoint = HoveredTargetManager.Singleton.target.transform.position;
                             unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToResource);
-                            
                         }
                     }
 
@@ -157,6 +162,7 @@ using UnityEngine;
             }
         }
         
+        // Preview pour la création d'un batiment
         void PrepareToCreateBuilding()
         {
             Vector3 mousePos = RaycastUtility.RaycastPosition();
@@ -164,15 +170,15 @@ using UnityEngine;
 
             if (Input.GetMouseButtonDown(0))
             {
-                // Je cree le batiment en question a cet endroit
-
+                // Je crée le batiment en question a cet endroit
                 ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, mousePos);
                 ElementPlacer.Singleton.StopPrevizualition();
-                
+                // je Reset l'action pour arrêter la prévisualisation du batiment à construire
                 ResetCurrentAction();
             }
         }
 
+        
         void ResetCurrentAction()
         {
             currentAction = ActorReference.ElementAction.None;

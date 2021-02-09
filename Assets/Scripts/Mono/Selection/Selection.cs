@@ -1,17 +1,13 @@
 ﻿using DefaultNamespace;
-using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AI;
+
+// Sélectionner une unité ( avec un raycast ) quand on clique gauche
+// et on affichera les informations de l'élément sur le GUI 
+
 
 public class Selection : MonoBehaviour
 {
-    // Sélectionner une unité ( avec un raycast ) quand on clique gauche
-
-    // et on affichera les informations de l'élément sur le GUI 
-
-    
-
     public bool mouseOnGUI = false;
 
     public static Selection Singleton;
@@ -21,17 +17,20 @@ public class Selection : MonoBehaviour
     public GameObject houseGhostPrefab;
     private GameObject houseGhost;
 
+    // Classe mère d' élement selectionné
     public class Selected
     {
         public GameObject SelectedGameObject;
         public ElementReference.Element SelectedElement;
     }
 
+    // Element selectionné de type unité
     public class UnitSelected : Selected
     {
         public Unit Unit;
     }
 
+    // Element selectionné de type building
     public class BuildingSelected : Selected
     {
         // public 
@@ -42,20 +41,12 @@ public class Selection : MonoBehaviour
         Singleton = this;
     }
     
-    
-
     public void ReceiveSelectionOnMouseUp(List<Selected> s)
     {
-        if (mouseOnGUI)
-        {
-            return;
-        }
-
+        if (mouseOnGUI) return;
         UpdateSelection(s);
     }
 
-    
-    
     public void UpdateSelection(List<Selected> s)
     {
         foreach (var go in selection)
@@ -71,16 +62,19 @@ public class Selection : MonoBehaviour
         }
     }
 
+    // Je réapplique le matériau de base à l'unité déselectionnée
     void Unselect(Selected s)
     {
         s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
     }
     
+    // J'applique le matériau de selection à l'unité selectionnée
     void Select(Selected s)
     {
         s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
     }
 
+    // Je déplace la sélection quand je clique droit sur l'écran 
     public void MoveSelection(Vector3 destination)
     {
         foreach (var selected in selection)
@@ -89,8 +83,7 @@ public class Selection : MonoBehaviour
             {
                 var unitSelected = selected as UnitSelected;
                 unitSelected.Unit.TargetPoint = destination;
-                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint);
-                
+                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint);              
             }
             
             // TODO

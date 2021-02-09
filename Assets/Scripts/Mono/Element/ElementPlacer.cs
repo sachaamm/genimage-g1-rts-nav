@@ -3,7 +3,7 @@ using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
 
-
+// Il gère la prévisualisation du placement des élements ( ex: placer un batiment avant de le construire )
     public class ElementPlacer : MonoBehaviour
     {
         public GameObject ghostPrefab;

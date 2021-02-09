@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using DefaultNamespace.Element;
-using UnityEngine;
+﻿using UnityEngine;
 
+// Un script associé à chaque élement, qui décrit le type de l'élement.
 public class ElementIdentity : MonoBehaviour
 {
     public ElementReference.Element Element;

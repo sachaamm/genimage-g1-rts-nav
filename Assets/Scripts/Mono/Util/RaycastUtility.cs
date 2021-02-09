@@ -1,6 +1,9 @@
 ﻿using UnityEngine;
 
-
+    /// <summary>
+    /// Un script utilitaire qui permet de récupérer la position actuelle du Raycast,
+    /// en utilisant la MainCamera et la position de la souris via la méthode ScreenPointToRay
+    /// </summary>
     public class RaycastUtility : MonoBehaviour
     {
         public static Vector3 RaycastPosition()
@@ -13,9 +16,7 @@
             if (Physics.Raycast(ray, out hit))
             {
                 if (hit.collider != null)
-                {
-                    // Select(hit.collider.gameObject);
-                    // Ind(hit.point, "start");
+                {               
                     return hit.point;
                 }
             }

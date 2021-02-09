@@ -1,7 +1,8 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
+/// <summary>
+/// Script permettant de vérifier qu'on a pas le souris dans le PanelMenu
+/// </summary>
 public class MainPanel : MonoBehaviour
 {
     public void onEnter()

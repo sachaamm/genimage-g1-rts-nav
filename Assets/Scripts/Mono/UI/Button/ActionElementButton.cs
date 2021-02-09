@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
-
+    
+// Quand on clique bouton d'action ( ex: CreateWorker )
     public class ActionElementButton : MonoBehaviour
     {
         public ActorReference.ElementWithAction elementWithAction;

@@ -1,17 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using DefaultNamespace.Element;
+﻿using DefaultNamespace.Element;
 using UnityEngine;
 
+// Le script qui va gérer la partie
 public class Game : MonoBehaviour
 {
     public static Game Singleton;
 
     void Awake()
     {
-        Singleton = this;
-        
-        
+        Singleton = this;    
     }
 
     void Start()

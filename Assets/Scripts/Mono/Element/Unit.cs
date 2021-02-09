@@ -1,28 +1,21 @@
-﻿
-using System;
-using System.Resources;
-using DefaultNamespace.Element;
+﻿using DefaultNamespace.Element;
 using Mono.Environment;
 using Mono.Util;
 using Scriptable.Scripts;
 using UnityEngine;
 using UnityEngine.UI;
 
-
+// Script placé sur chaque Element "Unit"
 public class Unit : MonoBehaviour
     {
-        // public ElementReference.Element Element;
-
+        
         public ActorReference.ElementAction currentAction = ActorReference.ElementAction.None;
-
-        // private int idleCompteur = 0;
 
         private float attaqueCompteur = 0;
 
         private ElementIdentity _elementIdentity;
 
         public Vector3 TargetPoint;
-        
         
         
         private void Start()
@@ -33,6 +26,7 @@ public class Unit : MonoBehaviour
 
         private void Update()
         {
+            // L'unité récupère ses stats dans l'ElementManager
             UnitScriptable unitScriptable = ElementManager.Singleton.GetElementScriptableForElement(_elementIdentity.Element) as UnitScriptable;
             
             if (currentAction == ActorReference.ElementAction.None)
@@ -40,6 +34,7 @@ public class Unit : MonoBehaviour
                 Idle(unitScriptable);
             }
             
+            // il se déplace vers l'enemy le plus proche
             if(currentAction == ActorReference.ElementAction.MoveToEnemy)
             {
                 var closest = ClosestEnemy();
@@ -71,6 +66,7 @@ public class Unit : MonoBehaviour
                 Attack(unitScriptable, closest);
             }
 
+            // il se déplace vers le point que lui indique le joueur
             if (currentAction == ActorReference.ElementAction.MoveToPoint)
             {
                 MoveToTargetPoint(unitScriptable);
@@ -82,6 +78,7 @@ public class Unit : MonoBehaviour
                 }
             }
 
+            // il se déplace vers la ressource
             if (currentAction == ActorReference.ElementAction.MoveToResource)
             {
                 MoveToTargetPoint(unitScriptable);

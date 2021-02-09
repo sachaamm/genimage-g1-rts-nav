@@ -8,23 +8,27 @@ using UnityEngine;
 using UnityEngine.UI;
 
 
+// Il va gérer l'apparition des enemy. Il contient la liste _enemies, contenant toutes les données concernant les enemy
 public class EnemyManager : MonoBehaviour
     {
-
         public static EnemyManager Singleton;
         
+        // Le dictionnaire qui contient les scriptableObjects correspondant aux ennemis.
         [SerializeField] private EnemyDictionary _enemyDictionary;
 
+        // Un dictionnaire d'ennemi associe un EnemyType à un EnemyScriptable
         [System.Serializable]
         public class EnemyDictionary : SerializableDictionaryBase<EnemyReference.EnemyType, EnemyScriptable>
         {
         }
-
+        
+        
         public float intervalCreationEnemy = 10;
         private float compteurCreationEnemy;
 
         public bool autoCreateEnemy = false;
 
+        // La classe permettant de regrouper toutes les données nécessaires ( ex: gameObject, health, type d'ennemi etc...)
         public class EnemyWithHealth
         {
             public GameObject enemyGameObject;
@@ -66,7 +70,6 @@ public class EnemyManager : MonoBehaviour
             Singleton = this;
         }
 
-
         void Update()
         {
             if(autoCreateEnemy) AutoCreate();
@@ -75,7 +78,6 @@ public class EnemyManager : MonoBehaviour
             {
                 CreateEnemy();
             }
-
         }
 
         void AutoCreate()

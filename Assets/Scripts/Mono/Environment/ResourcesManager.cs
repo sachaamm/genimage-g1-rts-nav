@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using DefaultNamespace.Element;
 using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
@@ -8,6 +7,8 @@ using UnityEngine;
 
 namespace Mono.Environment
 {
+    // Il gère les ressources, l'instantiation des ressources, et la liste resourcesList 
+    // qui contient toutes les données relatives aux ressources
     public class ResourcesManager : MonoBehaviour
     {
         [SerializeField] private ResourceDictionary _resourceDictionary;
@@ -42,7 +43,6 @@ namespace Mono.Environment
             }
             
         }
-
         public GameObject GetClosestResourceOfType()
         {
             GameObject closestResource = null;
@@ -69,8 +69,6 @@ namespace Mono.Environment
             resourcesList.Add(newResource);
         }
         
-        
-
         public ResourceScriptable GetResourceScriptable(ResourcesReference.Resource resource)
         {
             return Singleton._resourceDictionary[resource];

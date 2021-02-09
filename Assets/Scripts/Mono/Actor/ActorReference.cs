@@ -4,9 +4,10 @@
 
     public class ActorReference
     {
+        // Enumeration décrivant les différentes actions possibles d'un élément
         public enum ElementAction
         {
-            CreateWorker,
+            CreateWorker, // par exemple une maison peut produire un ouvrier
             CreateBuilding,
             None,
             CreateSoldier,
@@ -18,13 +19,19 @@
             SeekClosestResource,
         }
         
+        
+        // Un objet contentant une ElementAction appliquée à une liste de GameObject
         public class ElementWithAction
         {
             public ActorReference.ElementAction ElementAction;
             public List<GameObject> ElementsForAction;
         }
 
-        public static bool ElementWithActionListAlreadyContainsElementAction(List<ElementWithAction> elementWithActions, ElementAction elementAction)
+        
+        // Elle renvoie un booléen qui correspond à la présence d'une ElementAction dans une liste de ElementWithAction
+        public static bool ElementWithActionListAlreadyContainsElementAction(
+            List<ElementWithAction> elementWithActions, 
+            ElementAction elementAction)
         {
             foreach (ElementWithAction elementWithAction in elementWithActions)
             {
@@ -34,7 +41,11 @@
             return false;
         }
 
-        public static ElementWithAction GetElementWithActionForElementActionInList(List<ElementWithAction> elementWithActions, ElementAction elementAction)
+
+        // Elle renvoie un ElementWithAction pour une ElementAction donnée dans une liste de ElementWithAction
+        public static ElementWithAction GetElementWithActionForElementActionInList(
+            List<ElementWithAction> elementWithActions, 
+            ElementAction elementAction)
         {
             foreach (ElementWithAction elementWithAction in elementWithActions)
             {

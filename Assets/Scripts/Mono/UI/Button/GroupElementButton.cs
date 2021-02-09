@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+///  Script appliqué à chaque bouton de "GroupElement".
+///  GroupElement correspond à l'affichage de l'icone de l'élement
+/// </summary>
 public class GroupElementButton : MonoBehaviour
 {
 

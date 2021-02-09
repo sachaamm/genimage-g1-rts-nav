@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Security.Cryptography;
+﻿using System.Collections.Generic;
 using Mono.Entity;
 using Mono.Util;
 using RotaryHeart.Lib.SerializableDictionary;
@@ -10,12 +8,14 @@ using UnityEngine.UI;
 
 namespace DefaultNamespace.Element
 {
+    // Il va instantier les élements et il contient la liste des éléments, regroupant toutes les données relatives aux élements
     public class ElementManager : MonoBehaviour
     {
         public static ElementManager Singleton;
 
         public Transform ElementsParent;
 
+        // Le dictionnaire des stats des Element
         [SerializeField] private ElementDictionary _elementDictionary;
 
         [System.Serializable]
@@ -64,6 +64,7 @@ namespace DefaultNamespace.Element
             
         }
 
+        // la liste de tous les élements qui peuvent sous notre controle (qui ne sont pas ennemis.)
         public List<ElementGameObject> elementsNonEnemy = new List<ElementGameObject>();
 
         public GameObject debugActorCanvasPrefab;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+// Le script de la caméra
 public class RtsCamera : MonoBehaviour
 {
     public Vector3 MousePos;
@@ -12,7 +13,6 @@ public class RtsCamera : MonoBehaviour
         
     }
 
-    
     void Update()
     {   
         MousePos = Input.mousePosition;

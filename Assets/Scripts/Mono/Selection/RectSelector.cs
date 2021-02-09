@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
 
-
+// Script permettant de réaliser une selection à partir d'un rectangle 
     public class RectSelector : MonoBehaviour
     {
         public GameObject rectSelector;
@@ -21,12 +20,11 @@ using UnityEngine;
         private void Update()
         {
 
+            // Je commence la sélection quand j'enfonce le clique gauche
             if (Input.GetMouseButtonDown(0))
             {
-                startMousePos = Input.mousePosition;
-                
-                startMouseWorldPos = RaycastUtility.RaycastPosition();
-                
+                startMousePos = Input.mousePosition;            
+                startMouseWorldPos = RaycastUtility.RaycastPosition();             
             }
             
             if (Input.GetMouseButton(0))
@@ -39,9 +37,10 @@ using UnityEngine;
                 rectSelector.SetActive(false);
             }
 
+            // Je valide la sélection quand je relache le clique gauche
             if (Input.GetMouseButtonUp(0) && !Selection.Singleton.mouseOnGUI)
             {
-                List<Selection.Selected> unitsInRect = UnitsInRect();
+                List<Selection.Selected> unitsInRect = ElementsInRect();
 
                 List<ActorReference.ElementWithAction> elementActions = ElementWithActionsFromSelection(unitsInRect);
                 
@@ -49,12 +48,10 @@ using UnityEngine;
                 
                 Selection.Singleton.ReceiveSelectionOnMouseUp(unitsInRect);
                 UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(elementActions);
-                
+                UiManager.Singleton.UpdateActionsLayout(elementActions);             
             }
             
         }
-
         public static List<ActorReference.ElementWithAction> ElementWithActionsFromSelection(List<Selection.Selected> selection)
         {
             List<ActorReference.ElementWithAction> elementActions = new List<ActorReference.ElementWithAction>();
@@ -101,7 +98,7 @@ using UnityEngine;
                 return elementActions;
         }
         
-
+        // Dessiner le rectangle de selection à l'ecran
         void DrawRect()
         {
             
@@ -122,11 +119,10 @@ using UnityEngine;
                                                      -
                                                      new Vector3(width/2, height/2, 0);
 
-
         }
 
-
-        List<Selection.Selected> UnitsInRect()
+        // La liste des élements selectionnés par le rectangle de sélection
+        List<Selection.Selected> ElementsInRect()
         {
             List<Selection.Selected> unitsInRect = new List<Selection.Selected>();
             
@@ -140,7 +136,7 @@ using UnityEngine;
             
             foreach (Transform child in elementsParent)
             {
-                if (InBounds(min, max, child.position))
+                if (InRectBounds(min, max, child.position))
                 {
                     AddElementInSelection(child.gameObject, unitsInRect);
                 }
@@ -149,6 +145,7 @@ using UnityEngine;
             return unitsInRect;
         }
 
+        // Pour chaque élement contenu dans le rectangle de sélection, on l'ajoute à la selection
         public List<Selection.Selected> AddElementInSelection(GameObject element, List<Selection.Selected> selection)
         {
             ElementIdentity elementIdentity = element.GetComponent<ElementIdentity>();
@@ -173,8 +170,8 @@ using UnityEngine;
             return selection;
         }
         
-
-        bool InBounds(Vector3 min, Vector3 max, Vector3 pos)
+        // Position Contenue dans le rectangle de sélection
+        bool InRectBounds(Vector3 min, Vector3 max, Vector3 pos)
         {
             if (pos.x > min.x && pos.x < max.x && pos.z > min.z && pos.z < max.z) return true;
             return false;
