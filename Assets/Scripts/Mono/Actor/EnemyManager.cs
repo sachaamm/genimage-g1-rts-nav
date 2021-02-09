@@ -110,7 +110,7 @@ public class EnemyManager : MonoBehaviour
 
         public Vector3 RandomSpawnPos()
         {
-            float e = 10;
+            float e = 10 * 50;
             return new Vector3(Random.Range(-e, e), 0, Random.Range(-e,e));
         }
 

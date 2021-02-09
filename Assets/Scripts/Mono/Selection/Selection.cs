@@ -81,9 +81,12 @@ public class Selection : MonoBehaviour
         {
             if (selected.GetType() == typeof(UnitSelected))
             {
+                
                 var unitSelected = selected as UnitSelected;
-                unitSelected.Unit.TargetPoint = destination;
-                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint);              
+                unitSelected.Unit.Release();
+                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint); 
+                unitSelected.Unit.SetTargetPoint(destination);
+                             
             }
             
             // TODO

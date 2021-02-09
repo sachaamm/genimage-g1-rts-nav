@@ -1,26 +1,111 @@
-﻿using DefaultNamespace.Element;
+﻿using System.Resources;
+using DefaultNamespace.Element;
 using Mono.Util;
 using Scriptable.Scripts;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 // Script placé sur chaque Element "Unit"
 public class Unit : MonoBehaviour
     {
         
-        public ActorReference.ElementAction currentAction = ActorReference.ElementAction.None;
+        ActorReference.ElementAction currentAction = ActorReference.ElementAction.None;
 
         private float attaqueCompteur = 0;
 
         private ElementIdentity _elementIdentity;
 
-        public Vector3 TargetPoint;
-        
+
+        Vector3 targetPoint;
+
+        NavMeshAgent navMeshAgent;
+
+        private bool start = false;
+
+        public GameObject unitTarget;
         
         private void Start()
         {
+            navMeshAgent = GetComponent<NavMeshAgent>();
             _elementIdentity = GetComponent<ElementIdentity>();
             SetState(ActorReference.ElementAction.None);
+
+        }
+
+        bool IsTargetingAction(ActorReference.ElementAction elementAction)
+        {
+            // return elementAction == ActorReference.ElementAction.MoveToResource || elementAction == ActorReference.ElementAction.BringBackResource;
+            return elementAction == ActorReference.ElementAction.BringBackResource;
+        }
+
+        // Quand j'arrete l'action avant d'avoir atteint ma cible
+        public void Release()
+        {
+            if (currentAction == ActorReference.ElementAction.MoveToResource)
+            {
+                // On relache la ressource
+                ResourcesManager.Singleton.ReleaseResource(unitTarget);
+            }
+        }
+        
+
+        public void SetTargetPoint(Vector3 p)
+        {
+            
+            
+            // soit le point p est sur le navmesh
+
+            // soit le point p est sur le navmesh
+            NavMeshHit hit;
+
+            // Par rapport à l'endroit idéal ou on veut aller, on veux récupérer la position la plus proche contenue dans le navMesh
+            
+            // on utilise position qui est un décalage de la position p vers le joueur
+            Vector3 position = p + NavMeshUtility.GetDiffNormalizedFromPosition(transform.position, p,1);
+            
+
+            if (NavMesh.SamplePosition(position, out hit, 10000.0f, NavMesh.AllAreas))
+            {
+                targetPoint = hit.position;
+            }
+            else
+            {
+                Debug.LogError("NavMeshHit failed");
+            }
+            
+            
+            if (IsTargetingAction(currentAction))
+            {
+                
+
+            }
+            else
+            {
+                // targetPoint = p;
+            }
+            
+            
+            if (IsMovingAction())
+            {
+                // si c'est une action de déplacement alors on va vers la cible
+                navMeshAgent.destination = targetPoint;
+            }
+            else
+            {
+                // si ce n'est pas une action de déplacement, la cible est soi-même
+                navMeshAgent.destination = transform.position;
+            }
+            
+            DebugUtility.InstantiateDebugPoint(p, "p");
+            DebugUtility.InstantiateDebugPoint(position, "position");
+            DebugUtility.InstantiateDebugPoint(targetPoint, "TargetPoint");
+            
+        }
+
+        bool IsMovingAction()
+        {
+            return currentAction != ActorReference.ElementAction.None;
         }
 
         private void Update()
@@ -64,62 +149,86 @@ public class Unit : MonoBehaviour
                 
                 Attack(unitScriptable, closest);
             }
-
-            // il se déplace vers le point que lui indique le joueur
-            if (currentAction == ActorReference.ElementAction.MoveToPoint)
+            
+            if (!navMeshAgent.pathPending)
             {
-                MoveToTargetPoint(unitScriptable);
-                
-                if (Vector3.Distance(TargetPoint, transform.position) <
-                    0.5f)
+                if (navMeshAgent.remainingDistance < 1f)
                 {
-                    SetState(ActorReference.ElementAction.None);
+                    Debug.Log("OnTargetReached " + currentAction);
+                    OnTargetReachedNextState();
                 }
             }
-
-            // l'ouvrier se déplace vers la ressource
-            if (currentAction == ActorReference.ElementAction.MoveToResource)
-            {
-                MoveToTargetPoint(unitScriptable);
-                
-                // quand j'atteins la ressource
-                if (Vector3.Distance(TargetPoint, transform.position) <
-                    0.5f)
-                {
-                    // je définis comme target la maison la plus proche, pour revenir.
-                    TargetPoint = ElementManager.Singleton.GetClosestElementOfType(ElementReference.Element.House).transform.position;
-                    SetState(ActorReference.ElementAction.BringBackResource);
-                }
-            }
-
-            // l'ouvrier ramène la ressource à la maison la plus proche
-            if (currentAction == ActorReference.ElementAction.BringBackResource)
-            {
-                MoveToTargetPoint(unitScriptable);
-                
-                // Quand j'arrive à la maison
-                if (Vector3.Distance(TargetPoint, transform.position) <
-                    0.5f)
-                {
-                    // je me remets à chercher la ressource la plus proche
-                    SetState(ActorReference.ElementAction.SeekClosestResource);
-                    ResourcesManager.Singleton.AddMineral(8);
-
-                }
-            }
-
+            
             // l'ouvrier chercher la resource la plus proche
-            if (currentAction == ActorReference.ElementAction.SeekClosestResource)
-            {
-                TargetPoint = ResourcesManager.Singleton.GetClosestResourceOfType(transform.position).transform.position;
-                SetState(ActorReference.ElementAction.MoveToResource);
-            }
+            // if (currentAction == ActorReference.ElementAction.SeekClosestResource)
+            // {
+            //     SetTargetPoint(ResourcesManager.Singleton.GetClosestResourceOfType(transform.position).transform.position);             
+            //     SetState(ActorReference.ElementAction.MoveToResource);
+            // }
             
             
         }
-        
-        
 
+        // Le prochain state quand on a atteint la cible
+        void OnTargetReachedNextState()
+        {
+            Vector3 newTargetPos = new Vector3();
+            GameObject newTarget = null;
+            
+            if (currentAction == ActorReference.ElementAction.None || currentAction == ActorReference.ElementAction.MoveToPoint) return;
+
+            bool matchCase = true;
+            
+            switch (currentAction)
+            {
+                case ActorReference.ElementAction.MoveToResource:
+                    SetState(ActorReference.ElementAction.BringBackResource);
+                    GameObject resource = ResourcesManager.Singleton.GetClosestResourceOfType(transform.position); // on relache la ressource vers laquelle on est allés, qui est la ressource la plus proche
+                    ResourcesManager.Singleton.ReleaseResource(resource);
+                    
+                    newTarget =
+                        ElementManager.Singleton.GetClosestElementOfType(ElementReference.Element.House,
+                            transform.position);
+                    
+                    newTargetPos = newTarget
+                        .transform.position;
+                    
+                    
+                    Debug.Log("Je retourne vers la maison");
+                    
+                    break;
+                
+                case ActorReference.ElementAction.BringBackResource:
+                    SetState(ActorReference.ElementAction.MoveToResource);
+                    newTarget = ResourcesManager.Singleton.GetClosestAvaibleResourceOfType(transform.position);
+                    newTargetPos = newTarget.transform.position;
+                    ResourcesManager.Singleton.AccaparateResource(newTarget);
+                    ResourcesManager.Singleton.AddMineral(8);
+                    
+                    
+                    Debug.Log("Je retourne chercher du minerai");
+                    break;
+                
+                default:
+                    matchCase = false; // on a pas trouvé de cas géré
+                    break;
+                    
+            }
+
+            if (matchCase)
+            {
+                unitTarget = newTarget;
+                SetTargetPoint(newTargetPos); // si on a pu trouvé un cas géré, on redéfini le targetPoint
+                navMeshAgent.SetDestination(targetPoint); // on met a jour la destination du NavMeshAgent
+            }
+            else
+            {
+                Debug.Log(currentAction + " triggered any next state.");
+            }
+            
+        }
+
+   
         public void SetState(ActorReference.ElementAction action)
         {
             if (DebugUtility.DebugActors)
@@ -166,8 +275,9 @@ public class Unit : MonoBehaviour
         // L'unité se déplace vers la cible "TargetPoint" ( Vector3 )
         void MoveToTargetPoint(UnitScriptable unitScriptable)
         {
-            Vector3 diff = TargetPoint - transform.position;
-            transform.position += diff.normalized * unitScriptable.MoveSpeed;
+            navMeshAgent.SetDestination(targetPoint);
+            // Vector3 diff = TargetPoint - transform.position;
+            // transform.position += diff.normalized * unitScriptable.MoveSpeed;
         }
 
         void Attack(UnitScriptable unitScriptable, EnemyManager.EnemyWithHealth closest)

@@ -4,6 +4,7 @@ using Mono.Util;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.UI;
 
 namespace DefaultNamespace.Element
@@ -97,6 +98,12 @@ namespace DefaultNamespace.Element
             
             if (elementScriptable.GetType() == typeof(UnitScriptable))
             {
+                var agent = newElement.AddComponent<NavMeshAgent>();
+                agent.angularSpeed = 500000;
+                agent.speed *= 50;
+                agent.acceleration *= 50;
+                // agent.radius = 0.1f;
+                // agent.autoBraking = false;
                 newElement.AddComponent<Unit>();
             }
 
@@ -150,14 +157,14 @@ namespace DefaultNamespace.Element
             return elementScriptable;
         }
 
-        public GameObject GetClosestElementOfType(ElementReference.Element element)
+        public GameObject GetClosestElementOfType(ElementReference.Element element, Vector3 pos)
         {
             ElementManager.ElementGameObject closestNonEnemy = null;
             float minDistance = Mathf.Infinity;
             
             foreach (ElementManager.ElementGameObject nonEnemy in ElementManager.Singleton.elementsNonEnemy)
             {
-                float distance = Vector3.Distance(nonEnemy.elementGameObject.transform.position, transform.position);
+                float distance = Vector3.Distance(nonEnemy.elementGameObject.transform.position, pos);
                 if (distance < minDistance)
                 {
                     if (nonEnemy.elementGameObject.GetComponent<ElementIdentity>().Element == element)

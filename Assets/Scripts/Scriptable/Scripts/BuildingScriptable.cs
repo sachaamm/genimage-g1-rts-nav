@@ -7,5 +7,7 @@ namespace Scriptable.Scripts
     {
         public int moneyCost = 5;
         public int gazCost = 5;
+        public Mesh ghostBuildingMesh;
+        // public Transform ghostBuildingTransform;
     }
 }

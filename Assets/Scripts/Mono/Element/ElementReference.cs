@@ -6,14 +6,16 @@
         {
             House,
             Worker,
-            Soldier
+            Soldier,
+            Caserne
         }
 
         // Définir si un élement est constructible 
         public static bool IsBuildingElement(Element element)
         {
             if (element == Element.House) return true;
-            
+            if (element == Element.Caserne) return true;
+
             return false;
         }
 

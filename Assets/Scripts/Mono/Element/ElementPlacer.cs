@@ -12,6 +12,7 @@ public class ElementPlacer : MonoBehaviour
         private GameObject ghost;
         public static ElementPlacer Singleton;
 
+        private MeshFilter ghostMeshFilter;
    
 
     // Le dictionnaire des stats des Element
@@ -27,19 +28,26 @@ public class ElementPlacer : MonoBehaviour
     public ElementReference.Element elementTypeOfNewBuilding;
 
         
+        
         private void Awake()
         {
             Singleton = this;
             ghost = GameObject.Instantiate(ghostPrefab);
+            ghostMeshFilter = ghost.GetComponent<MeshFilter>();
             ghost.SetActive(false);
+            
         }
 
         public void PrevisualizeBuildingGhost(Vector3 pos, ElementReference.Element element)
         {
             ElementScriptable elementScriptable = ElementManager.Singleton.GetElementScriptableForElement(element);
+            BuildingScriptable buildingScriptable = elementScriptable as BuildingScriptable;
             ghost.transform.localScale = elementScriptable.Prefab.transform.localScale;
             ghost.SetActive(true);
+            // ghost.transform.localScale = elementScriptable.Prefab.transform.localScale;
             ghost.transform.position = pos;
+            
+            ghostMeshFilter.mesh = buildingScriptable.ghostBuildingMesh;
         }
 
         public void StopPrevizualition()

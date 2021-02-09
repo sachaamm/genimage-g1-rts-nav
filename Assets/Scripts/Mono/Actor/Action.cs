@@ -161,8 +161,13 @@ public class Action : MonoBehaviour
                         if (HoveredTargetManager.Singleton.targetType == EntityReference.Entity.Resource)
                         {
                             // on définit l'action de l'ouvrier à "MoveToRessource"
-                            unitSelected.Unit.TargetPoint = HoveredTargetManager.Singleton.target.transform.position;
+                            unitSelected.Unit.unitTarget = HoveredTargetManager.Singleton.target;
                             unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToResource);
+                            unitSelected.Unit.SetTargetPoint(HoveredTargetManager.Singleton.target.transform.position);
+                            
+                            
+                            ResourcesManager.Singleton.AccaparateResource(HoveredTargetManager.Singleton.target);
+                            
                         }
                     }
 
@@ -179,7 +184,8 @@ public class Action : MonoBehaviour
         void PrepareToCreateBuilding()
         {
             Vector3 mousePos = RaycastUtility.RaycastPosition();
-            ElementPlacer.Singleton.PrevisualizeBuildingGhost(mousePos, ElementReference.Element.House);
+            ElementPlacer.Singleton.PrevisualizeBuildingGhost(mousePos,
+                ElementPlacer.Singleton.elementTypeOfNewBuilding);
 
             if (Input.GetMouseButtonDown(0))
             {
@@ -191,7 +197,7 @@ public class Action : MonoBehaviour
                 ResourcesManager.Singleton.SpendGaz(buildingScriptable.gazCost);
 
                 // Je crée le batiment en question a cet endroit
-                ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, mousePos);
+                ElementManager.Singleton.InstantiateElement(ElementPlacer.Singleton.elementTypeOfNewBuilding, mousePos);
                 ElementPlacer.Singleton.StopPrevizualition();
                 // je Reset l'action pour arrêter la prévisualisation du batiment à construire
                 ResetCurrentAction();

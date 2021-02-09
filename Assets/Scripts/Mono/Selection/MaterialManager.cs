@@ -10,6 +10,10 @@ namespace DefaultNamespace
 
         public Material SelectedMaterial;
         public Material DefaultMaterial;
+
+        public Material MineraiDefaultMaterial;
+        public Material MineraiUnavailableMaterial;
+        public Material MineraiNegativeWorkersMaterial;
         
         private void Awake()
         {

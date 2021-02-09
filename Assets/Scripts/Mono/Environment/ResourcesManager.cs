@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
@@ -20,10 +21,16 @@ using UnityEngine.UI;
 
         public static ResourcesManager Singleton;
 
-        public List<GameObject> resourcesList = new List<GameObject>();
+        public List<ResourceGameObject> resourcesList = new List<ResourceGameObject>();
+
+        public class ResourceGameObject
+        {
+            public GameObject gameObject;
+            public int workers;
+        }
 
         // private donc modifiables uniquement dans ce script
-        int mineralAmount = 100;
+        int mineralAmount = 6000;
         int gazAmount = 0;
 
         // acces public vers la valeur de mineralAmount et gazAmount
@@ -70,25 +77,46 @@ using UnityEngine.UI;
 
         void CreateResources()
         {
-            int nbResources = 10;
+            int nbResources = 100;
 
             for (int i = 0; i < nbResources; i++)
             {
-                InstantiateResource(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
+                var r = InstantiateResource(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
+                r.name = "Minerai " + i;
             }
             
         }
+        
+        
+        public GameObject GetClosestAvaibleResourceOfType(Vector3 pos)
+        {
+            GameObject closestResource = null;
+            float minDistance = Mathf.Infinity;
+            
+            foreach (var r in Singleton.resourcesList)
+            {
+                float distance = Vector3.Distance(r.gameObject.transform.position, pos);
+                if (distance < minDistance && r.workers == 0)
+                {
+                    closestResource = r.gameObject;
+                    minDistance = distance;                
+                }
+            }
+            
+            return closestResource;
+        }
+        
         public GameObject GetClosestResourceOfType(Vector3 pos)
         {
             GameObject closestResource = null;
             float minDistance = Mathf.Infinity;
             
-            foreach (GameObject r in Singleton.resourcesList)
+            foreach (var r in Singleton.resourcesList)
             {
-                float distance = Vector3.Distance(r.transform.position, pos);
+                float distance = Vector3.Distance(r.gameObject.transform.position, pos);
                 if (distance < minDistance)
                 {
-                    closestResource = r;
+                    closestResource = r.gameObject;
                     minDistance = distance;                
                 }
             }
@@ -96,11 +124,63 @@ using UnityEngine.UI;
             return closestResource;
         }
 
-        void InstantiateResource(ResourcesReference.Resource resource, Vector3 pos)
+        public void AccaparateResource(GameObject resource)
+        {
+            foreach (var r in Singleton.resourcesList)
+            {
+                if (resource == r.gameObject)
+                {
+                    r.workers++; // si il s'agit de la ressource ciblée, je la bloque pour un ouvrier
+                    UpdateMineraiMaterialAvailability(r);
+                }
+            }
+        }
+
+        public void ReleaseResource(GameObject resource)
+        {
+            foreach (var r in Singleton.resourcesList)
+            {
+                if (resource == r.gameObject)
+                {
+                    r.workers--; // si il s'agit de la ressource ciblée, je la debloque pour les autres ouvriers
+                    UpdateMineraiMaterialAvailability(r);
+                }
+            }
+        }
+
+        void UpdateMineraiMaterialAvailability(ResourceGameObject r)
+        {
+            if (r.workers == 0)
+            {
+                r.gameObject.GetComponent<MeshRenderer>().material =
+                    MaterialManager.Singleton.MineraiDefaultMaterial;
+            }
+
+            if (r.workers < 0)
+            {
+                r.gameObject.GetComponent<MeshRenderer>().material =
+                    MaterialManager.Singleton.MineraiNegativeWorkersMaterial;
+            }
+                    
+            if (r.workers > 0)
+            {
+                r.gameObject.GetComponent<MeshRenderer>().material =
+                    MaterialManager.Singleton.MineraiUnavailableMaterial;
+            }
+        }
+
+        GameObject InstantiateResource(ResourcesReference.Resource resource, Vector3 pos)
         {
             var newResource = Instantiate(_resourceDictionary[resource].Prefab, pos, Quaternion.identity);
             newResource.AddComponent<EntityObject>().entityType = EntityReference.Entity.Resource;
-            resourcesList.Add(newResource);
+
+            ResourceGameObject resourceGameObject = new ResourceGameObject();
+            resourceGameObject.gameObject = newResource;
+            resourceGameObject.workers = 0;
+            
+            resourcesList.Add(resourceGameObject);
+
+            return newResource;
         }
         
         public ResourceScriptable GetResourceScriptable(ResourcesReference.Resource resource)
