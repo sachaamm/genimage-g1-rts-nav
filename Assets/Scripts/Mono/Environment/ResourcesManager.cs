@@ -4,9 +4,9 @@ using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
 using UnityEngine;
+using UnityEngine.UI;
 
-namespace Mono.Environment
-{
+
     // Il gère les ressources, l'instantiation des ressources, et la liste resourcesList 
     // qui contient toutes les données relatives aux ressources
     public class ResourcesManager : MonoBehaviour
@@ -21,8 +21,17 @@ namespace Mono.Environment
         public static ResourcesManager Singleton;
 
         public List<GameObject> resourcesList = new List<GameObject>();
-        
-        
+
+        // private donc modifiables uniquement dans ce script
+        int mineralAmount = 100;
+        int gazAmount = 0;
+
+        // acces public vers la valeur de mineralAmount et gazAmount
+        public int MineralAmount => mineralAmount;
+        public int GazAmount => gazAmount; 
+
+        public Text mineralAmountText, gazAmountText;
+
         private void Awake()
         {
             Singleton = this;
@@ -31,6 +40,32 @@ namespace Mono.Environment
         void Start()
         {
             CreateResources();
+        }
+
+        public void AddMineral(int amount)
+        {
+            mineralAmount += amount;
+        }
+
+        public void AddGaz(int amount)
+        {
+            gazAmount += amount;
+        }
+
+        public void SpendMineral(int amount)
+        {
+            mineralAmount -= amount;
+        }
+
+        public void SpendGaz(int amount)
+        {
+            gazAmount -= amount;
+        }
+
+        private void Update()
+        {
+            mineralAmountText.text = mineralAmount.ToString();
+            gazAmountText.text = gazAmount.ToString();
         }
 
         void CreateResources()
@@ -43,19 +78,18 @@ namespace Mono.Environment
             }
             
         }
-        public GameObject GetClosestResourceOfType()
+        public GameObject GetClosestResourceOfType(Vector3 pos)
         {
             GameObject closestResource = null;
             float minDistance = Mathf.Infinity;
             
-            foreach (var r in Singleton.resourcesList)
+            foreach (GameObject r in Singleton.resourcesList)
             {
-                float distance = Vector3.Distance(r.transform.position, transform.position);
+                float distance = Vector3.Distance(r.transform.position, pos);
                 if (distance < minDistance)
                 {
                     closestResource = r;
-                    minDistance = distance;
-                    
+                    minDistance = distance;                
                 }
             }
             
@@ -74,4 +108,3 @@ namespace Mono.Environment
             return Singleton._resourceDictionary[resource];
         }
     }
-}

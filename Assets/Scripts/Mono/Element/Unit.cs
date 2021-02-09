@@ -1,5 +1,4 @@
 ﻿using DefaultNamespace.Element;
-using Mono.Environment;
 using Mono.Util;
 using Scriptable.Scripts;
 using UnityEngine;
@@ -78,33 +77,41 @@ public class Unit : MonoBehaviour
                 }
             }
 
-            // il se déplace vers la ressource
+            // l'ouvrier se déplace vers la ressource
             if (currentAction == ActorReference.ElementAction.MoveToResource)
             {
                 MoveToTargetPoint(unitScriptable);
                 
+                // quand j'atteins la ressource
                 if (Vector3.Distance(TargetPoint, transform.position) <
                     0.5f)
                 {
+                    // je définis comme target la maison la plus proche, pour revenir.
                     TargetPoint = ElementManager.Singleton.GetClosestElementOfType(ElementReference.Element.House).transform.position;
                     SetState(ActorReference.ElementAction.BringBackResource);
                 }
             }
 
+            // l'ouvrier ramène la ressource à la maison la plus proche
             if (currentAction == ActorReference.ElementAction.BringBackResource)
             {
                 MoveToTargetPoint(unitScriptable);
                 
+                // Quand j'arrive à la maison
                 if (Vector3.Distance(TargetPoint, transform.position) <
                     0.5f)
                 {
+                    // je me remets à chercher la ressource la plus proche
                     SetState(ActorReference.ElementAction.SeekClosestResource);
+                    ResourcesManager.Singleton.AddMineral(8);
+
                 }
             }
 
+            // l'ouvrier chercher la resource la plus proche
             if (currentAction == ActorReference.ElementAction.SeekClosestResource)
             {
-                TargetPoint = ResourcesManager.Singleton.GetClosestResourceOfType().transform.position;
+                TargetPoint = ResourcesManager.Singleton.GetClosestResourceOfType(transform.position).transform.position;
                 SetState(ActorReference.ElementAction.MoveToResource);
             }
             
@@ -155,7 +162,8 @@ public class Unit : MonoBehaviour
             Vector3 diff = closest.enemyGameObject.transform.position - transform.position;
             transform.position += diff.normalized * unitScriptable.MoveSpeed;
         }
-
+        
+        // L'unité se déplace vers la cible "TargetPoint" ( Vector3 )
         void MoveToTargetPoint(UnitScriptable unitScriptable)
         {
             Vector3 diff = TargetPoint - transform.position;

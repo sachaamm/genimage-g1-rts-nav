@@ -15,7 +15,26 @@ public class UiManager : MonoBehaviour
 
     public Transform groupGridLayoutParent, actionsGridLayoutParent;
 
-    public GameObject groupElementPrefab, actionElementPrefab;
+    public GameObject groupElementPrefab, actionElementPrefab, createBuildingPrefab;
+
+    enum ActionMenu
+    {
+        Main, // c'est le menu ou il y a toutes les actions possibles pour les élements sélectionnés
+        CreateBuilding // c'est le menu qui me propose les différents batiments à construire
+    }
+
+
+    ActionMenu actionMenu = ActionMenu.Main;
+
+    List<BuildingCreateButtonOption> buildingCreateButtons = new List<BuildingCreateButtonOption>();
+
+    class BuildingCreateButtonOption
+    {
+        public Button buildingCreateButton;
+        public BuildingScriptable buildingScriptable;
+
+    }
+
     
     void Awake()
     {
@@ -23,6 +42,35 @@ public class UiManager : MonoBehaviour
 
         ResetGroupLayout();
         ResetActionsLayout();
+    }
+
+    public void EnterInCreateBuildingSubmenu()
+    {
+
+        actionMenu = ActionMenu.CreateBuilding;
+
+        // Je vais supprimer les boutons d'actions
+        ResetActionsLayout();
+        buildingCreateButtons = new List<BuildingCreateButtonOption>();
+
+        // Je vais créer un bouton pour chaque élement présent dans ElementPlacer.
+
+        foreach (KeyValuePair<ElementReference.Element, BuildingScriptable> kvp in ElementPlacer.Singleton.buildingDictionary)
+        {
+            // je crée un bouton
+            var createBuildingButton = Instantiate(createBuildingPrefab, actionsGridLayoutParent);
+            CreateBuildingButton buildingButton = createBuildingButton.GetComponent<CreateBuildingButton>();
+            buildingButton.buildingElement = kvp.Key;
+
+            createBuildingButton.GetComponentInChildren<Text>().text = kvp.Key.ToString();
+
+            BuildingCreateButtonOption buildingCreateButtonOption = new BuildingCreateButtonOption();
+            buildingCreateButtonOption.buildingCreateButton = createBuildingButton.transform.Find("Button").GetComponent<Button>();
+            buildingCreateButtonOption.buildingScriptable = kvp.Value;
+
+            buildingCreateButtons.Add(buildingCreateButtonOption);
+
+        }
     }
 
     /// <summary>
@@ -85,5 +133,36 @@ public class UiManager : MonoBehaviour
             Destroy(child.gameObject);
         }
     }
+
+    private void Update()
+    {
+        if(actionMenu == ActionMenu.CreateBuilding)
+        {
+            UpdateCreateBuildingAvailability();
+        }
+    }
+
+    // si le batiment coute trop cher pour nos ressources, on le desactive, sinon il reste interactable
+    void UpdateCreateBuildingAvailability()
+    {
+        
+        foreach(BuildingCreateButtonOption option in buildingCreateButtons)
+        {
+
+            var mineral = ResourcesManager.Singleton.MineralAmount;
+            var gaz = ResourcesManager.Singleton.GazAmount;
+            // si le cout du batiment est supérieur en minerai disponible ou/et en gaz disponible
+            if (option.buildingScriptable.moneyCost > mineral || option.buildingScriptable.gazCost > gaz)
+            {
+                option.buildingCreateButton.interactable = false;
+            }
+            else
+            {
+                option.buildingCreateButton.interactable = true;
+            }
+        }
+    }
+
+
 
 }

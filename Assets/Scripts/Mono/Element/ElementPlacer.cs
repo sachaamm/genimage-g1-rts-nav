@@ -2,13 +2,30 @@
 using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
+using System.Collections.Generic;
+using RotaryHeart.Lib.SerializableDictionary;
 
 // Il gère la prévisualisation du placement des élements ( ex: placer un batiment avant de le construire )
-    public class ElementPlacer : MonoBehaviour
+public class ElementPlacer : MonoBehaviour
     {
         public GameObject ghostPrefab;
         private GameObject ghost;
         public static ElementPlacer Singleton;
+
+   
+
+    // Le dictionnaire des stats des Element
+    [SerializeField] public BuildingDictionary buildingDictionary;
+
+    [System.Serializable]
+    public class BuildingDictionary : SerializableDictionaryBase<ElementReference.Element, BuildingScriptable>
+    {
+    }
+
+
+    // Le type d'élement du building que je suis en train de placer
+    public ElementReference.Element elementTypeOfNewBuilding;
+
         
         private void Awake()
         {

@@ -1919,11 +1919,11 @@ GameObject:
   - component: {fileID: 1300503270}
   - component: {fileID: 1300503269}
   - component: {fileID: 1300503271}
+  - component: {fileID: 1300503275}
+  - component: {fileID: 1300503276}
   - component: {fileID: 1300503272}
   - component: {fileID: 1300503274}
   - component: {fileID: 1300503273}
-  - component: {fileID: 1300503275}
-  - component: {fileID: 1300503276}
   - component: {fileID: 1300503277}
   m_Layer: 0
   m_Name: GameMaster
@@ -2000,7 +2000,7 @@ MonoBehaviour:
     _keys: 010000000000000002000000
     _values:
     - {fileID: 11400000, guid: 994ff72d29636494ebb1f333a49e8558, type: 2}
-    - {fileID: 11400000, guid: 4d065277b5bf28e4da2498ed54e85f3b, type: 2}
+    - {fileID: 11400000, guid: 2f43e17592af5d44392072fa9ce27dd3, type: 2}
     - {fileID: 11400000, guid: 7969cf05b8798b14cbb5c6ad99a696ae, type: 2}
   prefabIndicator: {fileID: 8933763911862665439, guid: bc004488f85968c45baee39a625b6d5c,
     type: 3}
@@ -2032,6 +2032,34 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ghostPrefab: {fileID: 7031907662294724984, guid: 708ca00413185d34180d7948b696f3e7,
     type: 3}
+  buildingDictionary:
+    reorderableList:
+      canAdd: 1
+      canRemove: 1
+      draggable: 1
+      expandable: 1
+      multipleSelection: 1
+      isExpanded: 1
+      label:
+        m_Text: Keys
+        m_Image: {fileID: 0}
+        m_Tooltip: 
+      headerHeight: 18
+      footerHeight: 13
+      slideEasing: 0.15
+      verticalSpacing: 2
+      showDefaultBackground: 1
+      elementDisplayType: 0
+      elementNameProperty: 
+      elementNameOverride: 
+      elementIcon: {fileID: 0}
+    reqReferences: {fileID: 0}
+    isExpanded: 1
+    _keyValues: 00000000
+    _keys: 00000000
+    _values:
+    - {fileID: 11400000, guid: 2f43e17592af5d44392072fa9ce27dd3, type: 2}
+  elementTypeOfNewBuilding: 0
 --- !u!114 &1300503274
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2785,6 +2813,7 @@ MonoBehaviour:
     type: 3}
   actionElementPrefab: {fileID: 4891342944445555103, guid: 08ea7ffa490316340ac4389996b317ef,
     type: 3}
+  createBuildingPrefab: {fileID: 0}
 --- !u!114 &1751383873
 MonoBehaviour:
   m_ObjectHideFlags: 0

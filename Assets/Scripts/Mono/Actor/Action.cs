@@ -33,15 +33,29 @@ public class Action : MonoBehaviour
         
         }
 
+        public void InterpretCreateBuildingAction(ElementReference.Element element)
+        {
+            currentAction = ActorReference.ElementAction.CreateBuilding;
+            ElementPlacer.Singleton.elementTypeOfNewBuilding = element;
+        }
+
         // Quand je clique sur un bouton d'ElementAction, j'appelle la fonction InterpretAction qui me permet de définir l'action à effectuer
         public void InterpretAction(ActorReference.ElementWithAction elementWithAction)
         {
             bool preparingAction = false; // preparingAction = une action en 2 temps ( ex: CreateBuilding ) 
 
+            // si 
+            if(elementWithAction.ElementAction == ActorReference.ElementAction.CreateBuilding)
+            {
+                // j'appelle UI manager pour le mettre en contexte de menu "CreateBuilding"
+                UiManager.Singleton.EnterInCreateBuildingSubmenu();
+            }
+
+
             if (IsPreparingAction(elementWithAction.ElementAction))
             {
                 // Soit on appelle une action de "préparation" : Préparer la construction d'un batiment avec la prévisualisation
-                currentAction = elementWithAction.ElementAction;
+                // currentAction = elementWithAction.ElementAction;
             }
             else
             {
@@ -67,7 +81,6 @@ public class Action : MonoBehaviour
             {
                 CreateUnitInBuilding(elementWithAction, ElementReference.Element.Soldier);
             }
-            
             
         }
 
@@ -170,6 +183,13 @@ public class Action : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
+                ElementScriptable elementScriptableForBuilding = 
+                ElementManager.Singleton.GetElementScriptableForElement(ElementPlacer.Singleton.elementTypeOfNewBuilding);
+
+                BuildingScriptable buildingScriptable = elementScriptableForBuilding as BuildingScriptable;
+                ResourcesManager.Singleton.SpendMineral(buildingScriptable.moneyCost);
+                ResourcesManager.Singleton.SpendGaz(buildingScriptable.gazCost);
+
                 // Je crée le batiment en question a cet endroit
                 ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, mousePos);
                 ElementPlacer.Singleton.StopPrevizualition();
