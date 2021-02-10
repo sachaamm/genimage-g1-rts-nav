@@ -131,6 +131,9 @@ public class Unit : MonoBehaviour
 
                     if (triggerCount > 200)
                     {
+
+                        Release();
+                        
                         Debug.Log("Stuck");
                         destinationPointBeforeStuck = targetPoint;
                         Vector3 diff = 
@@ -351,15 +354,21 @@ public class Unit : MonoBehaviour
 
         private void OnTriggerEnter(Collider other)
         {
-            Debug.Log("on trigger enter with " + other.name);
-            inTrigger = true;
-            otherStuck = other.gameObject;
-
+            if (other.CompareTag("Unit"))
+            {
+                Debug.Log("on trigger enter with " + other.name);
+                inTrigger = true;
+                otherStuck = other.gameObject; 
+            }
+            
         }
 
         private void OnTriggerExit(Collider other)
         {
-            inTrigger = false;
-            triggerCount = 0;
+            if (other.CompareTag("Unit"))
+            {
+                inTrigger = false;
+                triggerCount = 0;
+            }
         }
     }

@@ -105,6 +105,7 @@ namespace DefaultNamespace.Element
                 // agent.radius = 0.1f;
                 // agent.autoBraking = false;
                 newElement.AddComponent<Unit>();
+                newElement.transform.tag = "Unit";
             }
 
             if (elementScriptable.GetType() == typeof(BuildingScriptable))
