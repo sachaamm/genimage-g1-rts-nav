@@ -1,4 +1,5 @@
-﻿using System.Resources;
+﻿using System;
+using System.Resources;
 using DefaultNamespace.Element;
 using Mono.Util;
 using Scriptable.Scripts;
@@ -24,6 +25,13 @@ public class Unit : MonoBehaviour
         private bool start = false;
 
         public GameObject unitTarget;
+
+        private int triggerCount = 0;
+        private bool inTrigger = false;
+
+        private Vector3 destinationPointBeforeStuck = new Vector3();
+
+        private GameObject otherStuck;
         
         private void Start()
         {
@@ -112,6 +120,34 @@ public class Unit : MonoBehaviour
         {
             // L'unité récupère ses stats dans l'ElementManager
             UnitScriptable unitScriptable = ElementManager.Singleton.GetElementScriptableForElement(_elementIdentity.Element) as UnitScriptable;
+
+            // Si l'action en cours est une action de déplacement
+            if (IsMovingAction())
+            {
+                // on vérifie qu'on est pas bloqué par d'autres agents
+                if (inTrigger)
+                {
+                    triggerCount++;
+
+                    if (triggerCount > 200)
+                    {
+                        Debug.Log("Stuck");
+                        destinationPointBeforeStuck = targetPoint;
+                        Vector3 diff = 
+                            transform.position - otherStuck.transform.position;
+                        SetTargetPoint(diff * 5);
+                        otherStuck.GetComponent<Unit>().SetTargetPoint(-diff * 5);
+                    }
+                    
+                    
+                }
+                else
+                {
+                    triggerCount = 0;
+                }
+                
+            }
+            
             
             if (currentAction == ActorReference.ElementAction.None)
             {
@@ -311,9 +347,18 @@ public class Unit : MonoBehaviour
             
             return closestEnemy;
         }
-        
 
-        
-        
-        
+
+        private void OnTriggerEnter(Collider other)
+        {
+            inTrigger = true;
+            otherStuck = other.gameObject;
+
+        }
+
+        private void OnTriggerExit(Collider other)
+        {
+            inTrigger = false;
+            triggerCount = 0;
+        }
     }
