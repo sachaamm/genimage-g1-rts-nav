@@ -134,9 +134,9 @@ public class Unit : MonoBehaviour
                         Debug.Log("Stuck");
                         destinationPointBeforeStuck = targetPoint;
                         Vector3 diff = 
-                            transform.position - otherStuck.transform.position;
-                        SetTargetPoint(diff * 5);
-                        otherStuck.GetComponent<Unit>().SetTargetPoint(-diff * 5);
+                            (transform.position - otherStuck.transform.position) * 2;
+                        SetTargetPoint(transform.position + diff);
+                        otherStuck.GetComponent<Unit>().SetTargetPoint(otherStuck.transform.position - diff);
                     }
                     
                     
@@ -351,6 +351,7 @@ public class Unit : MonoBehaviour
 
         private void OnTriggerEnter(Collider other)
         {
+            Debug.Log("on trigger enter with " + other.name);
             inTrigger = true;
             otherStuck = other.gameObject;
 
