@@ -10,7 +10,7 @@ namespace Mono.Util
     /// </summary>
     public class DebugUtility: MonoBehaviour
     {
-        public static bool DebugActors = true;
+        public static bool DebugActors = false;
 
         [SerializeField]
         private GameObject DebugPoint;

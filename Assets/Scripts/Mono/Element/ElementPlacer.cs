@@ -1,5 +1,4 @@
 ﻿using System;
-using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
 using System.Collections.Generic;

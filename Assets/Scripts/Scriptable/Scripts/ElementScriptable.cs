@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mono.Actor;
 using UnityEngine;
 
 namespace Scriptable.Scripts
@@ -7,6 +8,11 @@ namespace Scriptable.Scripts
     public class ElementScriptable : UnityEngine.ScriptableObject
     {
         public GameObject Prefab;
+        public Mesh ghostBuildingMesh;
+        public Material elementMaterial;
+        public int scaling = 50;
+        
+        
         public List<ActorReference.ElementAction> PossibleActions;
         public int MaxHealth = 100;
         public Sprite Icon;
@@ -14,5 +20,6 @@ namespace Scriptable.Scripts
         public int moneyCost = 5;
         public int gazCost = 5;
 
+        
     }
 }

@@ -1,51 +1,53 @@
-﻿using System;
-using System.Resources;
-using DefaultNamespace.Element;
+﻿using Mono.Actor;
 using Mono.Element;
+using Mono.Targeting;
 using Mono.Util;
-using Scriptable.Scripts;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.UI;
 
-// Script placé sur chaque Element "Unit"
-public class Unit : MonoBehaviour
+namespace Scriptable.Scripts.Sets
+{
+    [CreateAssetMenu(fileName = "FILENAME", menuName = "RtsTuto/RuntimeSets/UnitRuntimeSet", order = 0)]
+    public class UnitRuntimeSet : RuntimeSet<Unit>
     {
         
+    }
+
+    public class Unit
+    {
+        // Identity
+        public GameObject unit;
+        public ElementReference.Element Element;
+        // Action 
         ActorReference.ElementAction currentAction = ActorReference.ElementAction.None;
 
+        public ActorReference.ElementAction CurrentAction
+        {
+            get => currentAction;
+            set => currentAction = value;
+        }
+
+        // Nav
+        public NavMeshAgent navMeshAgent;
+        public GameObject unitTarget;
+        public Vector3 targetPoint;
+        
+        public int stuckTriggerCount = 0;
+        public bool stuckInTrigger = false;
+        
+        public GameObject otherStuck;
+        
         private float attaqueCompteur = 0;
 
-        private ElementIdentity _elementIdentity;
-        
-        Vector3 targetPoint;
 
-        NavMeshAgent navMeshAgent;
-
-        private bool start = false;
-
-        public GameObject unitTarget;
-
-        private int triggerCount = 0;
-        private bool inTrigger = false;
-        
-        private GameObject otherStuck;
-        
-        private void Start()
+        public Unit(GameObject unit, ElementReference.Element element)
         {
-            navMeshAgent = GetComponent<NavMeshAgent>();
-            _elementIdentity = GetComponent<ElementIdentity>();
-            SetState(ActorReference.ElementAction.None);
+            this.unit = unit;
+            Element = element;
 
+            navMeshAgent = unit.GetComponent<NavMeshAgent>();
         }
-
-        bool IsTargetingAction(ActorReference.ElementAction elementAction)
-        {
-            // return elementAction == ActorReference.ElementAction.MoveToResource || elementAction == ActorReference.ElementAction.BringBackResource;
-            return elementAction == ActorReference.ElementAction.BringBackResource;
-        }
-
-        // Quand j'arrete l'action avant d'avoir atteint ma cible
+        
         public void Release()
         {
             if (currentAction == ActorReference.ElementAction.MoveToResource)
@@ -65,7 +67,7 @@ public class Unit : MonoBehaviour
             // Par rapport à l'endroit idéal ou on veut aller, on veux récupérer la position la plus proche contenue dans le navMesh
             
             // on utilise position qui est un décalage de la position p vers le joueur
-            Vector3 position = p + NavMeshUtility.GetDiffNormalizedFromPosition(transform.position, p,1);
+            Vector3 position = p + NavMeshUtility.GetDiffNormalizedFromPosition(unit.transform.position, p,1);
             
 
             if (NavMesh.SamplePosition(position, out hit, 10000.0f, NavMesh.AllAreas))
@@ -77,7 +79,7 @@ public class Unit : MonoBehaviour
                 Debug.LogError("NavMeshHit failed");
             }
             
-            if (IsMovingAction())
+            if (ActorReference.IsMovingAction(currentAction))
             {
                 // si c'est une action de déplacement alors on va vers la cible
                 navMeshAgent.destination = targetPoint;
@@ -85,7 +87,7 @@ public class Unit : MonoBehaviour
             else
             {
                 // si ce n'est pas une action de déplacement, la cible est soi-même
-                navMeshAgent.destination = transform.position;
+                navMeshAgent.destination = unit.transform.position;
             }
             
             // DebugUtility.InstantiateDebugPoint(p, "p");
@@ -93,48 +95,43 @@ public class Unit : MonoBehaviour
             // DebugUtility.InstantiateDebugPoint(targetPoint, "TargetPoint");
             
         }
-
-        bool IsMovingAction()
-        {
-            return currentAction != ActorReference.ElementAction.None;
-        }
-
-        private void Update()
+        
+        public void Update()
         {
             // L'unité récupère ses stats dans l'ElementManager
-            UnitScriptable unitScriptable = ElementManager.Singleton.GetElementScriptableForElement(_elementIdentity.Element) as UnitScriptable;
+            UnitScriptable unitScriptable = ElementManager.Singleton.GetElementScriptableForElement(Element) as UnitScriptable;
 
             // Si l'action en cours est une action de déplacement
-            if (IsMovingAction())
+            if (ActorReference.IsMovingAction(currentAction))
             {
                 // on vérifie qu'on est pas bloqué par d'autres agents
-                if (inTrigger)
+                if (stuckInTrigger)
                 {
-                    triggerCount++;
+                    stuckTriggerCount++;
 
-                    if (triggerCount > 200)
+                    if (stuckTriggerCount > 200)
                     {
-
                         Release();
                         
                         // Debug.Log("Stuck");
                         // destinationPointBeforeStuck = targetPoint;
                         Vector3 diff = 
-                            (transform.position - otherStuck.transform.position) * 2;
-                        SetTargetPoint(transform.position + diff);
-                        otherStuck.GetComponent<Unit>().SetTargetPoint(otherStuck.transform.position - diff);
+                            (unit.transform.position - otherStuck.transform.position) * 2;
+                        SetTargetPoint(unit.transform.position + diff);
+                        // otherStuck.GetComponent<UnitBehaviour>().SetTargetPoint(otherStuck.transform.position - diff);
+                        UnitManager.Singleton.SetTargetPointToOtherUnit(otherStuck, otherStuck.transform.position - diff);
                     }
-                    
-                    
+
                 }
                 else
                 {
-                    triggerCount = 0;
+                    stuckTriggerCount = 0;
                 }
                 
             }
-            
-            
+
+            #region Actions
+
             if (currentAction == ActorReference.ElementAction.None)
             {
                 Idle(unitScriptable);
@@ -143,30 +140,30 @@ public class Unit : MonoBehaviour
             // il se déplace vers l'enemy le plus proche
             if(currentAction == ActorReference.ElementAction.MoveToEnemy)
             {
-                var closest = ClosestEnemy();
+                var closest = TargetManager.GetClosestEnemy(unit.transform.position);
                 MoveToEnemy(unitScriptable,closest);
 
-                if (Vector3.Distance(closest.enemyGameObject.transform.position, transform.position) <
+                if (Vector3.Distance(closest.enemyGameObject.transform.position, unit.transform.position) <
                     unitScriptable.RangeToAttack)
                 {
-                    SetState(ActorReference.ElementAction.Attack);
+                   CurrentAction = ActorReference.ElementAction.Attack;
                 }
             }
 
             if (currentAction == ActorReference.ElementAction.Attack)
             {
-                var closest = ClosestEnemy();
+                var closest = TargetManager.GetClosestEnemy(unit.transform.position);
                 
                 if (closest == null)
                 {
-                    SetState(ActorReference.ElementAction.None);
+                    CurrentAction = ActorReference.ElementAction.None;
                     return;
                 }
                 
-                if (Vector3.Distance(closest.enemyGameObject.transform.position, transform.position) >
+                if (Vector3.Distance(closest.enemyGameObject.transform.position, unit.transform.position) >
                     unitScriptable.RangeToAttack)
                 {
-                    SetState(ActorReference.ElementAction.None);
+                    CurrentAction = ActorReference.ElementAction.None;
                 }
                 
                 Attack(unitScriptable, closest);
@@ -180,17 +177,11 @@ public class Unit : MonoBehaviour
                     OnTargetReachedNextState();
                 }
             }
-            
-            // l'ouvrier chercher la resource la plus proche
-            // if (currentAction == ActorReference.ElementAction.SeekClosestResource)
-            // {
-            //     SetTargetPoint(ResourcesManager.Singleton.GetClosestResourceOfType(transform.position).transform.position);             
-            //     SetState(ActorReference.ElementAction.MoveToResource);
-            // }
-            
+
+            #endregion
             
         }
-
+        
         // Le prochain state quand on a atteint la cible
         void OnTargetReachedNextState()
         {
@@ -204,13 +195,13 @@ public class Unit : MonoBehaviour
             switch (currentAction)
             {
                 case ActorReference.ElementAction.MoveToResource:
-                    SetState(ActorReference.ElementAction.BringBackResource);
-                    GameObject resource = ResourcesManager.Singleton.GetClosestResourceOfType(transform.position); // on relache la ressource vers laquelle on est allés, qui est la ressource la plus proche
+                    currentAction = ActorReference.ElementAction.BringBackResource;
+                    GameObject resource = ResourcesManager.Singleton.GetClosestResourceOfType(unit.transform.position); // on relache la ressource vers laquelle on est allés, qui est la ressource la plus proche
                     ResourcesManager.Singleton.ReleaseResource(resource);
                     
                     newTarget =
                         ElementManager.Singleton.GetClosestElementOfType(ElementReference.Element.House,
-                            transform.position);
+                            unit.transform.position);
                     
                     newTargetPos = newTarget
                         .transform.position;
@@ -221,8 +212,8 @@ public class Unit : MonoBehaviour
                     break;
                 
                 case ActorReference.ElementAction.BringBackResource:
-                    SetState(ActorReference.ElementAction.MoveToResource);
-                    newTarget = ResourcesManager.Singleton.GetClosestAvaibleResourceOfType(transform.position);
+                    CurrentAction = ActorReference.ElementAction.MoveToResource;
+                    newTarget = ResourcesManager.Singleton.GetClosestAvaibleResourceOfType(unit.transform.position);
                     newTargetPos = newTarget.transform.position;
                     ResourcesManager.Singleton.AccaparateResource(newTarget);
                     ResourcesManager.Singleton.AddMineral(8);
@@ -249,36 +240,24 @@ public class Unit : MonoBehaviour
             }
             
         }
-
-   
-        public void SetState(ActorReference.ElementAction action)
-        {
-            if (DebugUtility.DebugActors)
-            {
-                GetComponentInChildren<Text>().text = action.ToString();
-            }
-            
-            currentAction = action;
-        }
-
+        
         void Idle(UnitScriptable unitScriptable)
         {
             // si autoAttackClosestEnemies
             if (unitScriptable.AutoAttackCloseEnemies)
             {
                 // on récpère l'ennemi le plus proche
-                var closestEnemy = ClosestEnemy();
+                var closestEnemy = TargetManager.GetClosestEnemy(unit.transform.position);
 
                 if (closestEnemy == null)
                 {
                     return;
-                    
                 }
 
-                if (Vector3.Distance(closestEnemy.enemyGameObject.transform.position, transform.position) <
+                if (Vector3.Distance(closestEnemy.enemyGameObject.transform.position, unit.transform.position) <
                     unitScriptable.TriggerAutoAttackRange)
                 {
-                    SetState(ActorReference.ElementAction.MoveToEnemy);
+                    CurrentAction = ActorReference.ElementAction.MoveToEnemy;
                 }
                 
                 // ClosestEnemy();
@@ -287,25 +266,9 @@ public class Unit : MonoBehaviour
             }
             
         }
-
-        void MoveToEnemy(UnitScriptable unitScriptable, EnemyManager.EnemyWithHealth closest)
-        {
-            Vector3 diff = closest.enemyGameObject.transform.position - transform.position;
-            transform.position += diff.normalized * unitScriptable.MoveSpeed;
-        }
         
-        // L'unité se déplace vers la cible "TargetPoint" ( Vector3 )
-        void MoveToTargetPoint(UnitScriptable unitScriptable)
-        {
-            navMeshAgent.SetDestination(targetPoint);
-            // Vector3 diff = TargetPoint - transform.position;
-            // transform.position += diff.normalized * unitScriptable.MoveSpeed;
-        }
-
         void Attack(UnitScriptable unitScriptable, EnemyManager.EnemyWithHealth closest)
         {
-            
-            
             attaqueCompteur += Time.deltaTime;
             
             if (attaqueCompteur >= unitScriptable.DamageInterval)
@@ -316,42 +279,22 @@ public class Unit : MonoBehaviour
             }
         }
         
-        EnemyManager.EnemyWithHealth ClosestEnemy()
+        void MoveToEnemy(UnitScriptable unitScriptable, EnemyManager.EnemyWithHealth closest)
         {
-            EnemyManager.EnemyWithHealth closestEnemy = null;
-            float minDistance = Mathf.Infinity;
-            
-            foreach (var enemy in EnemyManager.Singleton._enemies)
-            {
-                float distance = Vector3.Distance(enemy.enemyGameObject.transform.position, transform.position);
-                if (distance < minDistance)
-                {
-                    closestEnemy = enemy;
-                    minDistance = distance;
-                }
-            }
-            
-            return closestEnemy;
+            Vector3 diff = closest.enemyGameObject.transform.position - unit.transform.position;
+            unit.transform.position += diff.normalized * unitScriptable.MoveSpeed;
+        }
+        
+        public void OnTriggerEnter(GameObject other)
+        {
+            stuckInTrigger = true;
+            otherStuck = other.gameObject; 
         }
 
-
-        private void OnTriggerEnter(Collider other)
+        public void OnTriggerExit()
         {
-            if (other.CompareTag("Unit"))
-            {
-                // Debug.Log("on trigger enter with " + other.name);
-                inTrigger = true;
-                otherStuck = other.gameObject; 
-            }
-            
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (other.CompareTag("Unit"))
-            {
-                inTrigger = false;
-                triggerCount = 0;
-            }
+            stuckInTrigger = false;
+            stuckTriggerCount = 0;
         }
     }
+}

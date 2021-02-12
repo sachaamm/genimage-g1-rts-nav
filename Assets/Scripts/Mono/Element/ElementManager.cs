@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Mono.Ecs;
 using Mono.Entity;
 using Mono.Util;
 using RotaryHeart.Lib.SerializableDictionary;
@@ -92,6 +93,8 @@ namespace Mono.Element
             GameObject newElement =
                 Instantiate(elementScriptable.Prefab, position, Quaternion.identity, ElementsParent);
             
+            newElement.transform.name = UuidService.GetUuid();
+            
             GameObject indicatorNewElement = 
                 Instantiate(prefabIndicator, newElement.transform.position + new Vector3(0,1,0), 
                     Quaternion.Euler(new Vector3(0,0,0)), 
@@ -105,7 +108,6 @@ namespace Mono.Element
                 InstantiateLocalCanvasInActor(newElement);
             }
             
-            
             if (elementScriptable.GetType() == typeof(UnitScriptable))
             {
                 var agent = newElement.AddComponent<NavMeshAgent>();
@@ -115,23 +117,32 @@ namespace Mono.Element
                 // agent.radius = 0.1f;
                 // agent.autoBraking = false;
                 
-                
-                newElement.AddComponent<Unit>();
+                UnitManager.Singleton.AddUnitInRuntimeSet(newElement, element);
+                newElement.AddComponent<UnitBehaviour>();
                 newElement.transform.tag = "Unit";
 
                 var unitScriptable = elementScriptable as UnitScriptable;
                 populationAmount += unitScriptable.UnitPopulationCost;
+
+                EntityInstantiator.InstantiateUnitEntity(element, newElement);
             }
 
             if (elementScriptable.GetType() == typeof(BuildingScriptable))
             {
-                
+                EntityInstantiator.InstantiateBuildingEntity(element, newElement);
             }
 
             ElementIdentity elementIdentity = newElement.AddComponent<ElementIdentity>();
             elementIdentity.Element = element;
+
+            Image healthImg = null;
+
+            if (DebugUtility.DebugActors)
+            {
+                healthImg = GetHealthImg(newElement);
+            }
             
-            ElementGameObject elementGameObject = new ElementGameObject(newElement, element, GetHealthImg(newElement));
+            ElementGameObject elementGameObject = new ElementGameObject(newElement, element, healthImg);
 
             elementsNonEnemy.Add(elementGameObject);
         }

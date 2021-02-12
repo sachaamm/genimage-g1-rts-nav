@@ -1,6 +1,9 @@
 ﻿using System.Collections.Generic;
-using DefaultNamespace.Element;
+using System.Linq;
+using Mono.Actor;
+using Mono.Ecs;
 using Mono.Element;
+using Mono.Service;
 using Scriptable.Scripts;
 using UnityEngine;
 
@@ -49,7 +52,9 @@ using UnityEngine;
                 
                 Selection.Singleton.ReceiveSelectionOnMouseUp(unitsInRect);
                 UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);             
+                UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);
+                
+                SelectionService.SelectionChangedMessage(unitsInRect.Select(u => u.SelectedGameObject).Select(go => go.name).ToList());
             }
             
         }
@@ -151,11 +156,14 @@ using UnityEngine;
         {
             ElementIdentity elementIdentity = element.GetComponent<ElementIdentity>();
             
+            // TO CLEAN
             if (ElementReference.IsBuildingElement(elementIdentity.Element))
             {
                 Selection.BuildingSelected buildingSelected = new Selection.BuildingSelected();
                 buildingSelected.SelectedGameObject = element.gameObject;
                 buildingSelected.SelectedElement = elementIdentity.Element;
+                buildingSelected.SelectedEntity =
+                    EntityQueryManager.Singleton.GetEntityForGameObject(element.gameObject);
                 selection.Add(buildingSelected);
             }
                     
@@ -163,8 +171,9 @@ using UnityEngine;
             {
                 Selection.UnitSelected unitSelected = new Selection.UnitSelected();
                 unitSelected.SelectedGameObject = element.gameObject;
-                unitSelected.Unit = element.gameObject.GetComponent<Unit>();
+                unitSelected.UnitBehaviour = element.gameObject.GetComponent<UnitBehaviour>();
                 unitSelected.SelectedElement = elementIdentity.Element;
+                unitSelected.SelectedEntity = EntityQueryManager.Singleton.GetEntityForGameObject(element.gameObject);
                 selection.Add(unitSelected);
             }
 

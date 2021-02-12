@@ -1,5 +1,8 @@
 ﻿using DefaultNamespace;
 using System.Collections.Generic;
+using Mono.Actor;
+using Mono.Element;
+using Unity.Entities;
 using UnityEngine;
 
 // Sélectionner une unité ( avec un raycast ) quand on clique gauche
@@ -21,13 +24,14 @@ public class Selection : MonoBehaviour
     public class Selected
     {
         public GameObject SelectedGameObject;
+        public Entity SelectedEntity;
         public ElementReference.Element SelectedElement;
     }
 
     // Element selectionné de type unité
-    public class UnitSelected : Selected
+    public class UnitSelected : Selected // Plus utile
     {
-        public Unit Unit;
+        public UnitBehaviour UnitBehaviour; // Plus utile
     }
 
     // Element selectionné de type building
@@ -83,10 +87,15 @@ public class Selection : MonoBehaviour
             {
                 
                 var unitSelected = selected as UnitSelected;
-                unitSelected.Unit.Release();
-                unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToPoint); 
-                unitSelected.Unit.SetTargetPoint(destination);
-                             
+
+                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).Release();
+                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).CurrentAction = ActorReference.ElementAction.MoveToPoint;
+                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).SetTargetPoint(destination);
+                
+                // unitSelected.UnitBehaviour.Release();
+                // unitSelected.UnitBehaviour.SetState(ActorReference.ElementAction.MoveToPoint); 
+                // unitSelected.UnitBehaviour.SetTargetPoint(destination);
+
             }
             
             // TODO

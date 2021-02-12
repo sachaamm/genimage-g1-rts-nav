@@ -1,7 +1,7 @@
-﻿
-using DefaultNamespace.Element;
+﻿using Mono.Actor;
 using Mono.Element;
 using Mono.Entity;
+using Mono.Service;
 using Mono.UI;
 using Scriptable.Scripts;
 using UnityEngine;
@@ -102,8 +102,20 @@ public class Action : MonoBehaviour
             foreach (GameObject go in elementWithAction.ElementsForAction)
             {
                 Vector3 spawnPos = go.transform.position;
+
+                if (Input.GetKey(KeyCode.T))
+                {
+                    for (int i = 0; i < 10; i++)
+                    {
+                        ElementManager.Singleton.InstantiateElement(element, spawnPos);
+                    }
+                }
+                else
+                {
+                    ElementManager.Singleton.InstantiateElement(element, spawnPos);
+                }
                 
-                ElementManager.Singleton.InstantiateElement(element, spawnPos);
+                
             }
         }
 
@@ -169,14 +181,21 @@ public class Action : MonoBehaviour
                         // les éléments Worker peuvent cibler les ressources
                         if (HoveredTargetManager.Singleton.targetType == EntityReference.Entity.Resource)
                         {
+
+                            UnitManager.GetUnitForGameObject(selected.SelectedGameObject).unitTarget = HoveredTargetManager.Singleton.target;
+                            UnitManager.GetUnitForGameObject(selected.SelectedGameObject).CurrentAction = ActorReference.ElementAction.MoveToResource;
+                            UnitManager.GetUnitForGameObject(selected.SelectedGameObject).SetTargetPoint(HoveredTargetManager.Singleton.target.transform.position);
+                            
                             // on définit l'action de l'ouvrier à "MoveToRessource"
-                            unitSelected.Unit.unitTarget = HoveredTargetManager.Singleton.target;
-                            unitSelected.Unit.SetState(ActorReference.ElementAction.MoveToResource);
-                            unitSelected.Unit.SetTargetPoint(HoveredTargetManager.Singleton.target.transform.position);
+                            // unitSelected.UnitBehaviour.unitTarget = 
+                            // unitSelected.UnitBehaviour.SetState();
+                            // unitSelected.UnitBehaviour.SetTargetPoint();
                             
                             
                             ResourcesManager.Singleton.AccaparateResource(HoveredTargetManager.Singleton.target);
-                            
+
+                            SelectionService.ElementActionMessage(ActorReference.ElementAction.MoveToResource);
+
                         }
                     }
 

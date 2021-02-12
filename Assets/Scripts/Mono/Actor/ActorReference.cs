@@ -1,7 +1,8 @@
-﻿
-    using System.Collections.Generic;
-    using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
+namespace Mono.Actor
+{
     public class ActorReference
     {
         // Enumeration décrivant les différentes actions possibles d'un élément
@@ -33,7 +34,6 @@
             public ElementReference.Element UnitToCreate;
         }
 
-        
         // Elle renvoie un booléen qui correspond à la présence d'une ElementAction dans une liste de ElementWithAction
         public static bool ElementWithActionListAlreadyContainsElementAction(
             List<ElementWithAction> elementWithActions, 
@@ -62,5 +62,11 @@
             
             return null;
         }
+
+        public static bool IsMovingAction(ElementAction elementAction)
+        {
+            return elementAction != ActorReference.ElementAction.None;
+        }
         
     }
+}
