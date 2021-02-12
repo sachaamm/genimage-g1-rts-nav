@@ -8,6 +8,8 @@ public class RtsCamera : MonoBehaviour
     public Vector3 MousePos;
     public float moveSpeed;
     public float boundy;
+
+    public float zoomSpeed = 1;
     
     void Update()
     {   
@@ -34,8 +36,12 @@ public class RtsCamera : MonoBehaviour
         {
             Scroll(new Vector3(0, 0, 1));
         }
-        
-        
+
+
+        if (Input.mouseScrollDelta.y != 0)
+        {
+            transform.Translate(transform.up * zoomSpeed * Input.mouseScrollDelta.y);
+        }
         
     }
     void Scroll(Vector3 direction)

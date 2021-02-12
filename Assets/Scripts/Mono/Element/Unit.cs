@@ -193,7 +193,7 @@ public class Unit : MonoBehaviour
             {
                 if (navMeshAgent.remainingDistance < 1f)
                 {
-                    Debug.Log("OnTargetReached " + currentAction);
+                    // Debug.Log("OnTargetReached " + currentAction);
                     OnTargetReachedNextState();
                 }
             }
@@ -356,7 +356,7 @@ public class Unit : MonoBehaviour
         {
             if (other.CompareTag("Unit"))
             {
-                Debug.Log("on trigger enter with " + other.name);
+                // Debug.Log("on trigger enter with " + other.name);
                 inTrigger = true;
                 otherStuck = other.gameObject; 
             }

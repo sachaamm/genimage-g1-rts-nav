@@ -5,6 +5,7 @@ using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
 using UnityEngine;
+using UnityEngine.Experimental.Animations;
 using UnityEngine.UI;
 
 
@@ -130,6 +131,8 @@ using UnityEngine.UI;
             {
                 if (resource == r.gameObject)
                 {
+                    Debug.Log("Accaparate " + resource.name + " " + r.workers );
+                    
                     r.workers++; // si il s'agit de la ressource ciblée, je la bloque pour un ouvrier
                     UpdateMineraiMaterialAvailability(r);
                 }
@@ -142,8 +145,20 @@ using UnityEngine.UI;
             {
                 if (resource == r.gameObject)
                 {
+
+                    Debug.Log("Release " + resource.name + " " + r.workers );
+                    
                     r.workers--; // si il s'agit de la ressource ciblée, je la debloque pour les autres ouvriers
+                    
+                    if (r.workers < 0)
+                    {
+                        // Debug.LogError("ee");
+                        r.workers = 0;
+                    }
+                    
                     UpdateMineraiMaterialAvailability(r);
+
+                   
                 }
             }
         }

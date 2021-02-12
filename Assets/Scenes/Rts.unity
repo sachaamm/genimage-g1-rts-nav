@@ -1449,6 +1449,7 @@ MonoBehaviour:
   MousePos: {x: 0, y: 0, z: 0}
   moveSpeed: 0.5
   boundy: 0
+  zoomSpeed: 4
 --- !u!1001 &979733513
 PrefabInstance:
   m_ObjectHideFlags: 0
