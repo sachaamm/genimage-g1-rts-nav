@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Resources;
 using DefaultNamespace.Element;
+using Mono.Element;
 using Mono.Util;
 using Scriptable.Scripts;
 using UnityEngine;
@@ -16,8 +17,7 @@ public class Unit : MonoBehaviour
         private float attaqueCompteur = 0;
 
         private ElementIdentity _elementIdentity;
-
-
+        
         Vector3 targetPoint;
 
         NavMeshAgent navMeshAgent;
@@ -28,9 +28,7 @@ public class Unit : MonoBehaviour
 
         private int triggerCount = 0;
         private bool inTrigger = false;
-
-        private Vector3 destinationPointBeforeStuck = new Vector3();
-
+        
         private GameObject otherStuck;
         
         private void Start()
@@ -57,11 +55,8 @@ public class Unit : MonoBehaviour
             }
         }
         
-
         public void SetTargetPoint(Vector3 p)
         {
-            
-            
             // soit le point p est sur le navmesh
 
             // soit le point p est sur le navmesh
@@ -82,18 +77,6 @@ public class Unit : MonoBehaviour
                 Debug.LogError("NavMeshHit failed");
             }
             
-            
-            if (IsTargetingAction(currentAction))
-            {
-                
-
-            }
-            else
-            {
-                // targetPoint = p;
-            }
-            
-            
             if (IsMovingAction())
             {
                 // si c'est une action de déplacement alors on va vers la cible
@@ -105,9 +88,9 @@ public class Unit : MonoBehaviour
                 navMeshAgent.destination = transform.position;
             }
             
-            DebugUtility.InstantiateDebugPoint(p, "p");
-            DebugUtility.InstantiateDebugPoint(position, "position");
-            DebugUtility.InstantiateDebugPoint(targetPoint, "TargetPoint");
+            // DebugUtility.InstantiateDebugPoint(p, "p");
+            // DebugUtility.InstantiateDebugPoint(position, "position");
+            // DebugUtility.InstantiateDebugPoint(targetPoint, "TargetPoint");
             
         }
 
@@ -134,8 +117,8 @@ public class Unit : MonoBehaviour
 
                         Release();
                         
-                        Debug.Log("Stuck");
-                        destinationPointBeforeStuck = targetPoint;
+                        // Debug.Log("Stuck");
+                        // destinationPointBeforeStuck = targetPoint;
                         Vector3 diff = 
                             (transform.position - otherStuck.transform.position) * 2;
                         SetTargetPoint(transform.position + diff);

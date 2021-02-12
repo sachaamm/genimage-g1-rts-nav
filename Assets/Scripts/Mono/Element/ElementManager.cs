@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.UI;
 
-namespace DefaultNamespace.Element
+namespace Mono.Element
 {
     // Il va instantier les élements et il contient la liste des éléments, regroupant toutes les données relatives aux élements
     public class ElementManager : MonoBehaviour
@@ -114,6 +114,8 @@ namespace DefaultNamespace.Element
                 agent.acceleration *= 50;
                 // agent.radius = 0.1f;
                 // agent.autoBraking = false;
+                
+                
                 newElement.AddComponent<Unit>();
                 newElement.transform.tag = "Unit";
 
