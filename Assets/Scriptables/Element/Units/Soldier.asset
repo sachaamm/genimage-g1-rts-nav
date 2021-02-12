@@ -13,9 +13,11 @@ MonoBehaviour:
   m_Name: Soldier
   m_EditorClassIdentifier: 
   Prefab: {fileID: 3468402224456853157, guid: 39fbd7a35941692498edc58fd6ba8539, type: 3}
-  PossibleActions: 04000000
+  PossibleActions: 02000000
   MaxHealth: 200
   Icon: {fileID: 21300000, guid: 8fab81e9e7be61d42bfb55f3956842ad, type: 3}
+  moneyCost: 100
+  gazCost: 0
   RangeToAttack: 1
   MoveSpeed: 0.01
   DamageInterval: 1

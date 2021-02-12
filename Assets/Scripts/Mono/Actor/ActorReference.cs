@@ -7,16 +7,17 @@
         // Enumeration décrivant les différentes actions possibles d'un élément
         public enum ElementAction
         {
-            CreateWorker, // par exemple une maison peut produire un ouvrier
+            // CreateWorker, // par exemple une maison peut produire un ouvrier
             CreateBuilding,
             None,
-            CreateSoldier,
+            // CreateSoldier,
             Attack,
             MoveToEnemy,
             MoveToPoint,
             MoveToResource,
             BringBackResource,
             SeekClosestResource,
+            CreateUnit,
         }
         
         
@@ -25,6 +26,11 @@
         {
             public ActorReference.ElementAction ElementAction;
             public List<GameObject> ElementsForAction;
+        }
+
+        public class ElementWithActionCreateUnit : ElementWithAction
+        {
+            public ElementReference.Element UnitToCreate;
         }
 
         

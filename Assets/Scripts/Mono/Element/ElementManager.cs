@@ -69,10 +69,20 @@ namespace DefaultNamespace.Element
         public List<ElementGameObject> elementsNonEnemy = new List<ElementGameObject>();
 
         public GameObject debugActorCanvasPrefab;
+
+        private int populationAmount = 0;
+        private int populationAmountMax = 8;
+
+        public Text populationAmountText;
         
         private void Awake()
         {
             Singleton = this;
+        }
+
+        void Update()
+        {
+            populationAmountText.text = populationAmount + "/" + populationAmountMax;
         }
 
         public void InstantiateElement(ElementReference.Element element, Vector3 position)
@@ -106,6 +116,9 @@ namespace DefaultNamespace.Element
                 // agent.autoBraking = false;
                 newElement.AddComponent<Unit>();
                 newElement.transform.tag = "Unit";
+
+                var unitScriptable = elementScriptable as UnitScriptable;
+                populationAmount += unitScriptable.UnitPopulationCost;
             }
 
             if (elementScriptable.GetType() == typeof(BuildingScriptable))

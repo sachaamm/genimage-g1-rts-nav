@@ -7,7 +7,8 @@
             House,
             Worker,
             Soldier,
-            Caserne
+            Caserne,
+            Ravitaillement,
         }
 
         // Définir si un élement est constructible 

@@ -10,6 +10,9 @@ namespace Scriptable.Scripts
         public List<ActorReference.ElementAction> PossibleActions;
         public int MaxHealth = 100;
         public Sprite Icon;
+        
+        public int moneyCost = 5;
+        public int gazCost = 5;
 
     }
 }

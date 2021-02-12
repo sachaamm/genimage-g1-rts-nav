@@ -13,9 +13,10 @@ MonoBehaviour:
   m_Name: Caserne
   m_EditorClassIdentifier: 
   Prefab: {fileID: 4733838586228209571, guid: 6be46da559f777a4fbe977cd736fcc5c, type: 3}
-  PossibleActions: 03000000
+  PossibleActions: 
   MaxHealth: 250
   Icon: {fileID: 21300000, guid: ed17bb6b214c258428e10d7b7b0fe079, type: 3}
   moneyCost: 400
   gazCost: 0
   ghostBuildingMesh: {fileID: 10208, guid: 0000000000000000e000000000000000, type: 0}
+  producableUnits: 02000000

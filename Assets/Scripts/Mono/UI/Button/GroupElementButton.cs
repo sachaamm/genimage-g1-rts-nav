@@ -22,6 +22,6 @@ public class GroupElementButton : MonoBehaviour
         UiManager.Singleton.UpdateGroupLayout(new List<Selection.Selected>{Selected});
 
         List<ActorReference.ElementWithAction> elementWithActions = RectSelector.ElementWithActionsFromSelection(selection);
-        UiManager.Singleton.UpdateActionsLayout(elementWithActions);
+        UiManager.Singleton.UpdateActionsLayout(elementWithActions,selection);
     }
 }

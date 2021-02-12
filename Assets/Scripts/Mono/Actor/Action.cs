@@ -71,7 +71,14 @@ public class Action : MonoBehaviour
         void InstantAction(ActorReference.ElementWithAction elementWithAction)
         {
             ActorReference.ElementAction action = elementWithAction.ElementAction;
+
+            if (action == ActorReference.ElementAction.CreateUnit)
+            {
+                var elementWithActionUnit = elementWithAction as ActorReference.ElementWithActionCreateUnit;
+                CreateUnitInBuilding(elementWithAction, elementWithActionUnit.UnitToCreate);
+            }
             
+            /*
             if (action == ActorReference.ElementAction.CreateWorker)
             {
                 CreateUnitInBuilding(elementWithAction, ElementReference.Element.Worker);
@@ -81,6 +88,7 @@ public class Action : MonoBehaviour
             {
                 CreateUnitInBuilding(elementWithAction, ElementReference.Element.Soldier);
             }
+            */
             
         }
 

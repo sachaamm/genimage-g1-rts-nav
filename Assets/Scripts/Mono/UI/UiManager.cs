@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using DefaultNamespace.Element;
 using Scriptable.Scripts;
 using UnityEngine;
@@ -32,9 +33,13 @@ public class UiManager : MonoBehaviour
     {
         public Button buildingCreateButton;
         public BuildingScriptable buildingScriptable;
-
     }
 
+    class UnitCreateButtonOption
+    {
+        public Button unitCreateButton;
+        public UnitScriptable UnitScriptable;
+    }
     
     void Awake()
     {
@@ -43,6 +48,9 @@ public class UiManager : MonoBehaviour
         ResetGroupLayout();
         ResetActionsLayout();
     }
+    
+    
+    
 
     public void EnterInCreateBuildingSubmenu()
     {
@@ -111,16 +119,50 @@ public class UiManager : MonoBehaviour
     /// Elle met à jour l' ActionsLayout en fonction de la sélection
     /// </summary>
     /// <param name="elementActions"></param>
-    public void UpdateActionsLayout(List<ActorReference.ElementWithAction> elementActions)
+    public void UpdateActionsLayout(List<ActorReference.ElementWithAction> elementActions, List<Selection.Selected> selection)
     {
         ResetActionsLayout();
 
         foreach (ActorReference.ElementWithAction elementWithAction in elementActions)
         {
-            GameObject go = Instantiate(actionElementPrefab, actionsGridLayoutParent);
-            go.GetComponentInChildren<Text>().text = elementWithAction.ElementAction.ToString();
-            go.GetComponent<ActionElementButton>().elementWithAction = elementWithAction;
+            CreateActionButton(elementWithAction.ElementAction.ToString(), elementWithAction);
         }
+        
+        
+        List<ActorReference.ElementWithActionCreateUnit> elementWithActionCreateUnitList = new List<ActorReference.ElementWithActionCreateUnit>();
+
+        foreach (Selection.Selected selected in selection)
+        {
+            if (selected.GetType() == typeof(Selection.BuildingSelected))
+            {
+                BuildingScriptable buildingScriptable = ElementManager.Singleton.GetElementScriptableForElement(selected.SelectedElement) as BuildingScriptable;
+                foreach (var unit in buildingScriptable.producableUnits)
+                {
+                    if (!elementWithActionCreateUnitList.Select(e => e.UnitToCreate).Contains(unit))
+                    {
+                        ActorReference.ElementWithActionCreateUnit elementWithActionCreateUnit = new ActorReference.ElementWithActionCreateUnit();
+                        elementWithActionCreateUnit.UnitToCreate = unit;
+                        elementWithActionCreateUnit.ElementAction = ActorReference.ElementAction.CreateUnit;
+                        elementWithActionCreateUnit.ElementsForAction = new List<GameObject>{selected.SelectedGameObject};
+                    
+                        CreateActionButton("Create " + unit.ToString(), elementWithActionCreateUnit);
+                    }
+                    else
+                    {
+                        elementWithActionCreateUnitList
+                            .First(e => e.UnitToCreate == unit).ElementsForAction.Add(selected.SelectedGameObject);
+                    }
+                    
+                }
+            }
+        }
+    }
+
+    void CreateActionButton(string text, ActorReference.ElementWithAction elementWithAction)
+    {
+        GameObject go = Instantiate(actionElementPrefab, actionsGridLayoutParent);
+        go.GetComponentInChildren<Text>().text = text;
+        go.GetComponent<ActionElementButton>().elementWithAction = elementWithAction;
     }
 
     /// <summary>
@@ -136,11 +178,22 @@ public class UiManager : MonoBehaviour
 
     private void Update()
     {
+        if (actionMenu == ActionMenu.Main)
+        {
+            UpdateUnitCreationAvailability();
+        }
+        
         if(actionMenu == ActionMenu.CreateBuilding)
         {
             UpdateCreateBuildingAvailability();
         }
     }
+
+    void UpdateUnitCreationAvailability()
+    {
+        
+    }
+    
 
     // si le batiment coute trop cher pour nos ressources, on le desactive, sinon il reste interactable
     void UpdateCreateBuildingAvailability()

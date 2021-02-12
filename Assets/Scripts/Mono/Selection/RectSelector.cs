@@ -48,7 +48,7 @@ using UnityEngine;
                 
                 Selection.Singleton.ReceiveSelectionOnMouseUp(unitsInRect);
                 UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(elementActions);             
+                UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);             
             }
             
         }
