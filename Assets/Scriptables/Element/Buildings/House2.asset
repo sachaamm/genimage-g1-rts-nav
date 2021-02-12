@@ -13,10 +13,12 @@ MonoBehaviour:
   m_Name: House2
   m_EditorClassIdentifier: 
   Prefab: {fileID: 4155560469009627372, guid: a710cfc99fd08a443a5f669c5eeaf898, type: 3}
+  ghostBuildingMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  elementMaterial: {fileID: 2100000, guid: d312af3920b37c04286383062133a12d, type: 2}
+  scaling: 50
   PossibleActions: 
   MaxHealth: 300
   Icon: {fileID: 21300000, guid: 902e178f5be35094993a113ad836b04b, type: 3}
   moneyCost: 300
   gazCost: 0
-  ghostBuildingMesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
   producableUnits: 01000000

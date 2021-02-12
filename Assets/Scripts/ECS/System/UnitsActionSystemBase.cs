@@ -1,10 +1,13 @@
-﻿using ECS.Component;
+﻿using System.Collections.Generic;
+using ECS.Component;
 using Mono.Actor;
 using Mono.Element;
+using Mono.Service;
 using Mono.Static;
 using Mono.Targeting;
 using Mono.Util;
 using Scriptable.Scripts;
+using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine;
@@ -14,6 +17,26 @@ namespace ECS.System
 {
     public class UnitsSystemBase : SystemBase
     {
+        public struct MoveSelectionGroup
+        {
+            public List<int> selection;
+            public Vector3 destination;
+        }
+        
+        private MoveSelectionGroup moveSelectionGroup;
+        private bool MoveSelection = false;
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+
+            SelectionService.OnSelectionMoveToPoint += (sender, ints) =>
+            {
+                moveSelectionGroup = ints;
+                
+                MoveSelection = true;
+            };
+        }
+
         protected override void OnUpdate()
         {
             // L'unité récupère ses stats dans l'ElementManager
@@ -108,6 +131,30 @@ namespace ECS.System
                 #endregion
             
             }).WithoutBurst().Run();
+
+            if (Input.GetMouseButton(1))
+            {
+                
+
+            }
+
+            if (MoveSelection)
+            {
+                // TODO Pass selection in a job to Burst
+                // Performances médiocres a cause de l'event
+                Entities.ForEach((NavMeshAgent nav, ref Unit unit, ref Element element, ref Translation translation) =>
+                {
+                    if (moveSelectionGroup.selection.Contains(element.uuid))
+                    {
+                        Release(ref unit);
+                        SetTargetPoint(moveSelectionGroup.destination,ref unit, ref translation, nav);
+                    }
+
+                    unit.ElementAction = ActorReference.ElementAction.MoveToPoint;
+                }).WithoutBurst().Run();
+
+                MoveSelection = false;
+            }
         }
         
         

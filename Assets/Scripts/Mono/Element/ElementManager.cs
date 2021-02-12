@@ -118,7 +118,7 @@ namespace Mono.Element
                 // agent.autoBraking = false;
                 
                 UnitManager.Singleton.AddUnitInRuntimeSet(newElement, element);
-                newElement.AddComponent<UnitBehaviour>();
+                // newElement.AddComponent<UnitBehaviour>();
                 newElement.transform.tag = "Unit";
 
                 var unitScriptable = elementScriptable as UnitScriptable;

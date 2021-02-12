@@ -1,8 +1,6 @@
-﻿using ECS.Component;
-using Unity.Entities;
+﻿using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine.AI;
-using NotImplementedException = System.NotImplementedException;
 
 namespace ECS.System
 {

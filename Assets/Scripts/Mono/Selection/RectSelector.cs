@@ -162,8 +162,7 @@ using UnityEngine;
                 Selection.BuildingSelected buildingSelected = new Selection.BuildingSelected();
                 buildingSelected.SelectedGameObject = element.gameObject;
                 buildingSelected.SelectedElement = elementIdentity.Element;
-                buildingSelected.SelectedEntity =
-                    EntityQueryManager.Singleton.GetEntityForGameObject(element.gameObject);
+                
                 selection.Add(buildingSelected);
             }
                     
@@ -173,7 +172,7 @@ using UnityEngine;
                 unitSelected.SelectedGameObject = element.gameObject;
                 unitSelected.UnitBehaviour = element.gameObject.GetComponent<UnitBehaviour>();
                 unitSelected.SelectedElement = elementIdentity.Element;
-                unitSelected.SelectedEntity = EntityQueryManager.Singleton.GetEntityForGameObject(element.gameObject);
+                
                 selection.Add(unitSelected);
             }
 

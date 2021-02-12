@@ -1,7 +1,10 @@
 ﻿using DefaultNamespace;
 using System.Collections.Generic;
+using System.Linq;
+using ECS.System;
 using Mono.Actor;
 using Mono.Element;
+using Mono.Service;
 using Unity.Entities;
 using UnityEngine;
 
@@ -69,18 +72,28 @@ public class Selection : MonoBehaviour
     // Je réapplique le matériau de base à l'unité déselectionnée
     void Unselect(Selected s)
     {
-        s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
+        // s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
     }
     
     // J'applique le matériau de selection à l'unité selectionnée
     void Select(Selected s)
     {
-        s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
+        // s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
     }
 
     // Je déplace la sélection quand je clique droit sur l'écran 
     public void MoveSelection(Vector3 destination)
     {
+        List<int> uuidSelection = selection.Select(s => s.SelectedGameObject).Select(s => int.Parse(s.name)).ToList();
+        
+        SelectionService.SelectionMoveToPointMessage(
+            new UnitsSystemBase.MoveSelectionGroup
+            {
+                selection = uuidSelection,
+                destination = destination
+            }
+            );
+        
         foreach (var selected in selection)
         {
             if (selected.GetType() == typeof(UnitSelected))
@@ -88,9 +101,14 @@ public class Selection : MonoBehaviour
                 
                 var unitSelected = selected as UnitSelected;
 
-                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).Release();
-                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).CurrentAction = ActorReference.ElementAction.MoveToPoint;
-                UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).SetTargetPoint(destination);
+                
+                
+                // TODO BROKEN
+                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).Release();
+                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).CurrentAction = ActorReference.ElementAction.MoveToPoint;
+                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).SetTargetPoint(destination);
+                
+                
                 
                 // unitSelected.UnitBehaviour.Release();
                 // unitSelected.UnitBehaviour.SetState(ActorReference.ElementAction.MoveToPoint); 

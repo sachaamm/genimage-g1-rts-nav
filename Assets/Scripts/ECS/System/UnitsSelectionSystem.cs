@@ -1,39 +1,25 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel;
 using DefaultNamespace;
 using ECS.Component;
 using Mono.Actor;
 using Mono.Element;
 using Mono.Service;
 using Scriptable.Scripts;
-using Unity.Burst;
 using Unity.Collections;
 using Unity.Entities;
-using Unity.Jobs;
 using Unity.Rendering;
 using UnityEngine;
-using NotImplementedException = System.NotImplementedException;
 
 namespace ECS.System
 {
     public class UnitsSelectionSystem : ComponentSystem 
     {
-        EntityQuery m_Group;
         private List<int> selectionUuids = new List<int>();
         private bool OnSelectionChanged = false;
         
-        
-        public EntityCommandBuffer.Concurrent CommandBuffer;
-        private EndSimulationEntityCommandBufferSystem _endSimulationEntityCommandBufferSystem;
-        
-        
         protected override void OnCreate()
         {
-            _endSimulationEntityCommandBufferSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-            
             base.OnCreate();
-            
-            m_Group = GetEntityQuery(typeof(ECS.Component.Element), typeof(Unit));
             
             SelectionService.OnSelectionChanged += (object sender, List<string> uuidsSelections) =>
             {
@@ -46,15 +32,13 @@ namespace ECS.System
                 }
                 
                 OnSelectionChanged = true;
-                
-                _endSimulationEntityCommandBufferSystem = World.GetOrCreateSystem<EndSimulationEntityCommandBufferSystem>();
-                // AdaptMaterialToSelection();
             };
             
             SelectionService.OnElementAction += (object sender, ActorReference.ElementAction ElementAction) =>
             {
                 ApplyElementActionOnUnitSelection(ElementAction);
             };
+            
         }
 
         void AdaptMaterialToSelection()
@@ -113,8 +97,6 @@ namespace ECS.System
                 });
             }
             
-            
-            
             elements.Dispose();
             entities.Dispose();
             entitiesInSelection.Dispose();
@@ -141,7 +123,6 @@ namespace ECS.System
                 AdaptMaterialToSelection();
                 OnSelectionChanged = false;
             }
-            // AdaptMaterialToSelection();
         }
     }
 }

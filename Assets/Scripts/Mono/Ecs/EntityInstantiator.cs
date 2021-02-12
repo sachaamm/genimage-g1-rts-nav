@@ -48,7 +48,7 @@ namespace Mono.Ecs
             );
         }
 
-        static EntityArchetype MineralEntityArchetype()
+        static EntityArchetype ResourceEntityArchetype()
         {
             return EntityManager().CreateArchetype(
                 typeof(Translation),
@@ -56,8 +56,8 @@ namespace Mono.Ecs
                 typeof(Scale),
                 typeof(RenderMesh),
                 typeof(RenderBounds),
-                typeof(LocalToWorld)
-                
+                typeof(LocalToWorld),
+                typeof(Resource)
             );
         }
         
@@ -118,6 +118,39 @@ namespace Mono.Ecs
                 mesh = elementScriptable.ghostBuildingMesh,
                 material = elementScriptable.elementMaterial
             });
+        }
+
+        public static void InstantiateResourceEntity(ResourcesReference.Resource resource, Vector3 pos)
+        {
+            ResourceScriptable resourceScriptable = ResourcesManager.Singleton.GetResourceScriptable(resource);
+            
+            Unity.Entities.Entity resourceEntityArchetype = EntityManager().CreateEntity(ResourceEntityArchetype());
+            
+            EntityManager().AddSharedComponentData(resourceEntityArchetype, new RenderMesh
+            {
+                mesh = resourceScriptable.mesh,
+                material = resourceScriptable.material
+            });
+
+            EntityManager().AddComponentData(resourceEntityArchetype, new Resource
+            {
+                IsMineral = resource == ResourcesReference.Resource.MineralField,
+                Available = true
+            });
+
+            EntityManager().AddComponentData(resourceEntityArchetype, new Translation
+            {
+                Value = pos
+            });
+            
+            EntityManager().AddComponentData(resourceEntityArchetype, new Scale
+            {
+                Value = resourceScriptable.Scale
+            });
+
+
+
+            // EntityManager().AddComponentData()
         }
     }
 }

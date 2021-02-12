@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: MineralField
   m_EditorClassIdentifier: 
   Prefab: {fileID: 1788365772548029601, guid: b2b6879a7f444274498f673040c8c590, type: 3}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  material: {fileID: 0}

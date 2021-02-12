@@ -18,7 +18,7 @@ namespace Mono.Element
 
         public void AddUnitInRuntimeSet(GameObject unit, ElementReference.Element element)
         {
-            UnitRuntimeSet.Add( new Unit(unit, element));
+            // UnitRuntimeSet.Add( new Unit(unit, element));
         }
 
         public void RemoveUnitInRuntimeSet()

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using DefaultNamespace;
+using Mono.Ecs;
 using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
@@ -82,8 +83,9 @@ using UnityEngine.UI;
 
             for (int i = 0; i < nbResources; i++)
             {
-                var r = InstantiateResource(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
-                r.name = "Minerai " + i;
+                EntityInstantiator.InstantiateResourceEntity(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
+                // var r = InstantiateResource(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
+                // r.name = "Minerai " + i;
             }
             
         }
@@ -184,19 +186,19 @@ using UnityEngine.UI;
             }
         }
 
-        GameObject InstantiateResource(ResourcesReference.Resource resource, Vector3 pos)
-        {
-            var newResource = Instantiate(_resourceDictionary[resource].Prefab, pos, Quaternion.identity);
-            newResource.AddComponent<EntityObject>().entityType = EntityReference.Entity.Resource;
-
-            ResourceGameObject resourceGameObject = new ResourceGameObject();
-            resourceGameObject.gameObject = newResource;
-            resourceGameObject.workers = 0;
-            
-            resourcesList.Add(resourceGameObject);
-
-            return newResource;
-        }
+        // GameObject InstantiateResource(ResourcesReference.Resource resource, Vector3 pos)
+        // {
+        //     var newResource = Instantiate(_resourceDictionary[resource].Prefab, pos, Quaternion.identity);
+        //     newResource.AddComponent<EntityObject>().entityType = EntityReference.Entity.Resource;
+        //
+        //     ResourceGameObject resourceGameObject = new ResourceGameObject();
+        //     resourceGameObject.gameObject = newResource;
+        //     resourceGameObject.workers = 0;
+        //     
+        //     resourcesList.Add(resourceGameObject);
+        //
+        //     return newResource;
+        // }
         
         public ResourceScriptable GetResourceScriptable(ResourcesReference.Resource resource)
         {

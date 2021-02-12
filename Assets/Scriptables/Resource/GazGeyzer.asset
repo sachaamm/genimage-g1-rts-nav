@@ -13,3 +13,5 @@ MonoBehaviour:
   m_Name: GazGeyzer
   m_EditorClassIdentifier: 
   Prefab: {fileID: 5291036312386209615, guid: 3a5dd04826818614e830027d73ae3562, type: 3}
+  mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+  material: {fileID: 2100000, guid: 34fa8e80264e89b449747d17fdf36848, type: 2}

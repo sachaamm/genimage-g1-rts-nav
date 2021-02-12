@@ -6,5 +6,8 @@ namespace Scriptable.Scripts
     public class ResourceScriptable : ScriptableObject
     {
         public GameObject Prefab;
+        public Mesh mesh;
+        public Material material;
+        public int Scale = 30;
     }
 }
