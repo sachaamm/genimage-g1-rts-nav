@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Mono.Ecs;
+// using Mono.Ecs;
 using Mono.Entity;
 using Mono.Util;
 using RotaryHeart.Lib.SerializableDictionary;
@@ -75,6 +76,8 @@ namespace Mono.Element
         private int populationAmountMax = 8;
 
         public Text populationAmountText;
+
+        private int uuid = 0;
         
         private void Awake()
         {
@@ -86,22 +89,25 @@ namespace Mono.Element
             populationAmountText.text = populationAmount + "/" + populationAmountMax;
         }
 
-        public void InstantiateElement(ElementReference.Element element, Vector3 position)
+        public GameObject InstantiateElement(ElementReference.Element element, Vector3 position)
         {
             ElementScriptable elementScriptable = _elementDictionary[element];
             
             GameObject newElement =
                 Instantiate(elementScriptable.Prefab, position, Quaternion.identity, ElementsParent);
             
-            newElement.transform.name = UuidService.GetUuid();
+            
+            newElement.transform.name = uuid.ToString();
+            uuid++;
             
             GameObject indicatorNewElement = 
                 Instantiate(prefabIndicator, newElement.transform.position + new Vector3(0,1,0), 
                     Quaternion.Euler(new Vector3(0,0,0)), 
                     newElement.transform);
-
-            newElement.AddComponent<EntityObject>().entityType = EntityReference.Entity.Element;
             
+            newElement.AddComponent<EntityObject>().entityType = EntityReference.Entity.Element;
+
+            // ElementReferential.Singleton.AddReferentialEntry(int.Parse(newElement.transform.name), element);
 
             if (DebugUtility.DebugActors)
             {
@@ -145,6 +151,8 @@ namespace Mono.Element
             ElementGameObject elementGameObject = new ElementGameObject(newElement, element, healthImg);
 
             elementsNonEnemy.Add(elementGameObject);
+
+            return newElement;
         }
 
         public static Image GetHealthImg(GameObject element)

@@ -1,7 +1,6 @@
 ﻿using DefaultNamespace;
 using System.Collections.Generic;
 using System.Linq;
-using ECS.System;
 using Mono.Actor;
 using Mono.Element;
 using Mono.Service;
@@ -18,111 +17,60 @@ public class Selection : MonoBehaviour
 
     public static Selection Singleton;
 
-    public List<Selected> selection = new List<Selected>();
-
-    public GameObject houseGhostPrefab;
-    private GameObject houseGhost;
+    private List<Selected> _selection;
+    
 
     // Classe mère d' élement selectionné
     public class Selected
     {
-        public GameObject SelectedGameObject;
-        public Entity SelectedEntity;
+        public int SelectedUuid;
+        // public GameObject SelectedGameObject;
         public ElementReference.Element SelectedElement;
-    }
-
-    // Element selectionné de type unité
-    public class UnitSelected : Selected // Plus utile
-    {
-        public UnitBehaviour UnitBehaviour; // Plus utile
-    }
-
-    // Element selectionné de type building
-    public class BuildingSelected : Selected
-    {
-        // public 
     }
     
     private void Awake()
     {
         Singleton = this;
     }
-    
-    public void ReceiveSelectionOnMouseUp(List<Selected> s)
+
+    public static List<int> UuidSelection()
     {
-        if (mouseOnGUI) return;
-        UpdateSelection(s);
+        return Singleton.GetSelection().Select(e => e.SelectedUuid).ToList();
     }
 
-    public void UpdateSelection(List<Selected> s)
+    public void ReceiveSelection(List<Selected> newSelection)
     {
-        foreach (var go in selection)
-        {
-            Unselect(go);
-        }
-
-        selection = s;
-
-        foreach (var go in selection)
-        {
-            Select(go);
-        }
-    }
-
-    // Je réapplique le matériau de base à l'unité déselectionnée
-    void Unselect(Selected s)
-    {
-        // s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.DefaultMaterial;
-    }
-    
-    // J'applique le matériau de selection à l'unité selectionnée
-    void Select(Selected s)
-    {
-        // s.SelectedGameObject.GetComponent<MeshRenderer>().material = MaterialManager.Singleton.SelectedMaterial;
-    }
-
-    // Je déplace la sélection quand je clique droit sur l'écran 
-    public void MoveSelection(Vector3 destination)
-    {
-        List<int> uuidSelection = selection.Select(s => s.SelectedGameObject).Select(s => int.Parse(s.name)).ToList();
+        _selection = newSelection;
         
-        SelectionService.SelectionMoveToPointMessage(
-            new UnitsSystemBase.MoveSelectionGroup
-            {
-                selection = uuidSelection,
-                destination = destination
-            }
-            );
+        UiManager.Singleton.UpdateGroupLayout(newSelection);
+        UiManager.Singleton.UpdateActionsLayout(RectSelector.ElementWithActionsFromSelection(newSelection),newSelection);
+                
+        SelectionService.SelectionChangedMessage(newSelection.Select(u => u.SelectedUuid).ToList());
+    }
+
+    public List<Selected> GetSelection()
+    {
+        return _selection;
+    }
+
+    public void SelectPartOfMultiGroup(ElementReference.Element element)
+    {
+        int nbItems = 12;
+        int i = 0;
         
-        foreach (var selected in selection)
+        List<Selected> newSelection = new List<Selected>();
+        
+        foreach (var selected in _selection)
         {
-            if (selected.GetType() == typeof(UnitSelected))
+            if (selected.SelectedElement == element && i < nbItems)
             {
-                
-                var unitSelected = selected as UnitSelected;
-
-                
-                
-                // TODO BROKEN
-                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).Release();
-                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).CurrentAction = ActorReference.ElementAction.MoveToPoint;
-                // UnitManager.GetUnitForGameObject(unitSelected.SelectedGameObject).SetTargetPoint(destination);
-                
-                
-                
-                // unitSelected.UnitBehaviour.Release();
-                // unitSelected.UnitBehaviour.SetState(ActorReference.ElementAction.MoveToPoint); 
-                // unitSelected.UnitBehaviour.SetTargetPoint(destination);
-
+                newSelection.Add(selected);
+                i++;
             }
-            
-            // TODO
-            // NavMeshAgent navMeshAgent = selected.SelectedGameObject.GetComponent<NavMeshAgent>();
-            // if (navMeshAgent != null)
-            // {
-            //     navMeshAgent.destination = destination;
-            // }
         }
+        
+        
+        
     }
     
 }

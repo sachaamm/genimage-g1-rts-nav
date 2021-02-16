@@ -90,18 +90,61 @@ public class UiManager : MonoBehaviour
     {
         ResetGroupLayout();
 
-        foreach (var selected in selection)
+        int i = 0;
+
+        int nbUnitMaxInLayout = 10;
+
+        if (selection.Count <= nbUnitMaxInLayout)
         {
-            var groupElement = Instantiate(groupElementPrefab, groupGridLayoutParent);
-            ElementScriptable elementScriptable =
-                ElementManager.Singleton.GetElementScriptableForElement(selected.SelectedElement);
+            foreach (var selected in selection)
+            {
+                i++;
             
-            Transform button = groupElement.transform.Find("Button");
-            GroupElementButton groupElementButton = button.GetComponent<GroupElementButton>();
-            groupElementButton.Selected = selected;
+                var groupElement = Instantiate(groupElementPrefab, groupGridLayoutParent);
+                ElementScriptable elementScriptable =
+                    ElementManager.Singleton.GetElementScriptableForElement(selected.SelectedElement);
             
-            button.Find("Image").GetComponentInChildren<Image>().sprite = elementScriptable.Icon;
+                Transform button = groupElement.transform.Find("Button");
+                GroupElementButton groupElementButton = button.GetComponent<GroupElementButton>();
+                groupElementButton.Selected = selected;
+            
+                button.Find("Image").GetComponentInChildren<Image>().sprite = elementScriptable.Icon;
+                groupElement.transform.Find("Text").gameObject.SetActive(false);
+            }
         }
+        else
+        {
+            Dictionary<ElementReference.Element, int> GroupByElementType = new Dictionary<ElementReference.Element, int>();
+
+            foreach (var selected in selection)
+            {
+                if (GroupByElementType.ContainsKey(selected.SelectedElement))
+                {
+                    GroupByElementType[selected.SelectedElement]++;
+                }
+                else
+                {
+                    GroupByElementType.Add(selected.SelectedElement, 1);
+                }
+            }
+
+            foreach (var kvp in GroupByElementType)
+            {
+                var groupElement = Instantiate(groupElementPrefab, groupGridLayoutParent);
+                ElementScriptable elementScriptable =
+                    ElementManager.Singleton.GetElementScriptableForElement(kvp.Key);
+                
+                Transform button = groupElement.transform.Find("Button");
+                GroupElementButton groupElementButton = button.GetComponent<GroupElementButton>();
+                groupElementButton.multiMode = true;
+                // groupElementButton.Selected = selected;
+            
+                button.Find("Image").GetComponentInChildren<Image>().sprite = elementScriptable.Icon;
+                groupElement.transform.Find("Text").GetComponent<Text>().text = "x" + kvp.Value;
+            }
+        }
+
+        
         
     }
 
@@ -129,12 +172,11 @@ public class UiManager : MonoBehaviour
             CreateActionButton(elementWithAction.ElementAction.ToString(), elementWithAction);
         }
         
-        
         List<ActorReference.ElementWithActionCreateUnit> elementWithActionCreateUnitList = new List<ActorReference.ElementWithActionCreateUnit>();
 
         foreach (Selection.Selected selected in selection)
         {
-            if (selected.GetType() == typeof(Selection.BuildingSelected))
+            if (ElementReference.IsBuildingElement(selected.SelectedElement))
             {
                 BuildingScriptable buildingScriptable = ElementManager.Singleton.GetElementScriptableForElement(selected.SelectedElement) as BuildingScriptable;
                 foreach (var unit in buildingScriptable.producableUnits)
@@ -144,18 +186,20 @@ public class UiManager : MonoBehaviour
                         ActorReference.ElementWithActionCreateUnit elementWithActionCreateUnit = new ActorReference.ElementWithActionCreateUnit();
                         elementWithActionCreateUnit.UnitToCreate = unit;
                         elementWithActionCreateUnit.ElementAction = ActorReference.ElementAction.CreateUnit;
-                        elementWithActionCreateUnit.ElementsForAction = new List<GameObject>{selected.SelectedGameObject};
-                    
-                        CreateActionButton("Create " + unit.ToString(), elementWithActionCreateUnit);
+                        // elementWithActionCreateUnit.ElementsForAction = new List<GameObject>{selected.SelectedGameObject};
+                        // TODO selection action broken
+                        // CreateActionButton("Create " + unit.ToString(), elementWithActionCreateUnit);
                     }
                     else
                     {
-                        elementWithActionCreateUnitList
-                            .First(e => e.UnitToCreate == unit).ElementsForAction.Add(selected.SelectedGameObject);
+                        // TODO Broken element actions
+                        // elementWithActionCreateUnitList
+                        //     .First(e => e.UnitToCreate == unit).ElementsForAction.Add(selected.SelectedGameObject);
                     }
                     
                 }
             }
+         
         }
     }
 

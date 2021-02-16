@@ -1,4 +1,5 @@
 ﻿using Mono.Actor;
+using Mono.Service;
 using UnityEngine;
     
 // Quand on clique bouton d'action ( ex: CreateWorker )
@@ -7,6 +8,13 @@ using UnityEngine;
         public ActorReference.ElementWithAction elementWithAction;
         public void Click()
         {
-            Action.Singleton.InterpretAction(elementWithAction);
+            // Action.Singleton.InterpretAction(elementWithAction);
+            ActorReference.ElementAndAction elementAndAction = new ActorReference.ElementAndAction
+            {
+                Element = elementWithAction.Element,
+                ElementAction = elementWithAction.ElementAction
+            };
+            
+            SelectionService.ElementActionMessage(elementAndAction);
         }
     }

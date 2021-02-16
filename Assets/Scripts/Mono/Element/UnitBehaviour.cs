@@ -18,7 +18,7 @@ public class UnitBehaviour : MonoBehaviour
             if (other.CompareTag("Unit"))
             {
                 // Debug.Log("on trigger enter with " + other.name);
-                UnitManager.Singleton.EnterNavStuck(gameObject, other.gameObject);
+                // UnitManager.Singleton.EnterNavStuck(gameObject, other.gameObject);
             }
             
         }
@@ -27,7 +27,7 @@ public class UnitBehaviour : MonoBehaviour
         {
             if (other.CompareTag("Unit"))
             {
-                UnitManager.Singleton.ExitNavStuck(gameObject);
+                // UnitManager.Singleton.ExitNavStuck(gameObject);
             }
         }
     }

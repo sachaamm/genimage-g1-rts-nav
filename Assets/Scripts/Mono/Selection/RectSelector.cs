@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Mono.Actor;
-using Mono.Ecs;
+// using Mono.Ecs;
 using Mono.Element;
 using Mono.Service;
 using Scriptable.Scripts;
@@ -45,16 +45,14 @@ using UnityEngine;
             if (Input.GetMouseButtonUp(0) && !Selection.Singleton.mouseOnGUI)
             {
                 List<Selection.Selected> unitsInRect = ElementsInRect();
+                Selection.Singleton.ReceiveSelection(unitsInRect);
 
                 List<ActorReference.ElementWithAction> elementActions = ElementWithActionsFromSelection(unitsInRect);
                 
                 Debug.Log(unitsInRect.Count);
                 
-                Selection.Singleton.ReceiveSelectionOnMouseUp(unitsInRect);
-                UiManager.Singleton.UpdateGroupLayout(unitsInRect);
-                UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);
                 
-                SelectionService.SelectionChangedMessage(unitsInRect.Select(u => u.SelectedGameObject).Select(go => go.name).ToList());
+                // UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);
             }
             
         }
@@ -64,20 +62,18 @@ using UnityEngine;
 
                 foreach (Selection.Selected selected in selection)
                 {
-                    ElementIdentity elementIdentity = selected.SelectedGameObject.GetComponent<ElementIdentity>();
-
                     ElementScriptable elementScriptable =
-                        ElementManager.Singleton.GetElementScriptableForElement(elementIdentity.Element);
+                        ElementManager.Singleton.GetElementScriptableForElement(selected.SelectedElement);
+       
+                    List<int> selectedForActions = new List<int>();
+                    selectedForActions.Add(selected.SelectedUuid);
 
-                    List<GameObject> selectedForActions = new List<GameObject>();
-                    selectedForActions.Add(selected.SelectedGameObject);
-                    
                     foreach (ActorReference.ElementAction actionPossiblePourCetElement in elementScriptable.PossibleActions)
                     {
                         ActorReference.ElementWithAction elementWithAction = new ActorReference.ElementWithAction();
                         elementWithAction.ElementAction = actionPossiblePourCetElement;
                         elementWithAction.ElementsForAction = selectedForActions;
-                        
+                        elementWithAction.Element = selected.SelectedElement;
                         // si cette action de type ElementAction n'est pas deja présente dans la liste "elementsAction",
                         
                         if (!ActorReference.ElementWithActionListAlreadyContainsElementAction(elementActions, actionPossiblePourCetElement))
@@ -94,7 +90,8 @@ using UnityEngine;
                                     actionPossiblePourCetElement);
 
                             // -> j'ajoute le gameObject a la liste de elementWithAction.ElementsForAction correspondant 
-                            existingElementWithAction.ElementsForAction.Add(selected.SelectedGameObject);
+                            // existingElementWithAction.ElementsForAction.Add(selected.SelectedGameObject);
+                            // TODO : selection action broken
 
                         }
        
@@ -156,25 +153,11 @@ using UnityEngine;
         {
             ElementIdentity elementIdentity = element.GetComponent<ElementIdentity>();
             
-            // TO CLEAN
-            if (ElementReference.IsBuildingElement(elementIdentity.Element))
-            {
-                Selection.BuildingSelected buildingSelected = new Selection.BuildingSelected();
-                buildingSelected.SelectedGameObject = element.gameObject;
-                buildingSelected.SelectedElement = elementIdentity.Element;
+            Selection.Selected selected = new Selection.Selected();
+            selected.SelectedUuid = int.Parse(element.name);
+            selected.SelectedElement = elementIdentity.Element;
                 
-                selection.Add(buildingSelected);
-            }
-                    
-            if (ElementReference.IsUnitElement(elementIdentity.Element))
-            {
-                Selection.UnitSelected unitSelected = new Selection.UnitSelected();
-                unitSelected.SelectedGameObject = element.gameObject;
-                unitSelected.UnitBehaviour = element.gameObject.GetComponent<UnitBehaviour>();
-                unitSelected.SelectedElement = elementIdentity.Element;
-                
-                selection.Add(unitSelected);
-            }
+            selection.Add(selected);
 
             return selection;
         }

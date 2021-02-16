@@ -2,7 +2,7 @@
 
 namespace ECS.Component
 {
-    public struct Building : ISharedComponentData
+    public struct Building : IComponentData
     {
         
     }

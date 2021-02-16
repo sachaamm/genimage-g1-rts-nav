@@ -2,15 +2,12 @@
 
 namespace ECS.Component
 {
-    public struct Element: IComponentData
+    public struct UnitTarget : IComponentData
     {
-        public int uuid;
-        public ElementReference.Element element;
+        public Entity Target;
         public void Execute()
         {
             
         }
     }
-
-    
 }

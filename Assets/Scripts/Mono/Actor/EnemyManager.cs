@@ -108,11 +108,13 @@ public class EnemyManager : MonoBehaviour
             }
         }
 
-        public Vector3 RandomSpawnPos()
+        public static Vector3 RandomSpawnPos(float f = 50f)
         {
-            float e = 10 * 50;
+            float e = 10 * f;
             return new Vector3(Random.Range(-e, e), 0, Random.Range(-e,e));
         }
+        
+        
 
         public static EnemyScriptable GetEnemyScriptable(EnemyReference.EnemyType enemyType)
         {

@@ -21,7 +21,7 @@ namespace Mono.Ecs
         
         #region EntityArchetype
 
-        static EntityArchetype UnitEntityArchetype()
+        public static EntityArchetype UnitEntityArchetype()
         {
             return EntityManager().CreateArchetype(
                 typeof(Translation),
@@ -102,6 +102,11 @@ namespace Mono.Ecs
             
             Unity.Entities.Entity unit = EntityManager().CreateEntity(BuildingEntityArchetype());
             
+            EntityManager().AddComponentData(unit, new Translation
+            {
+                Value = newElement.transform.position
+            });
+            
             EntityManager().AddComponentData(unit, new Scale
             {
                 Value = elementScriptable.scaling
@@ -120,11 +125,14 @@ namespace Mono.Ecs
             });
         }
 
+        private static int resourceUuid = 0;
+
         public static void InstantiateResourceEntity(ResourcesReference.Resource resource, Vector3 pos)
         {
             ResourceScriptable resourceScriptable = ResourcesManager.Singleton.GetResourceScriptable(resource);
             
             Unity.Entities.Entity resourceEntityArchetype = EntityManager().CreateEntity(ResourceEntityArchetype());
+            resourceUuid++;
             
             EntityManager().AddSharedComponentData(resourceEntityArchetype, new RenderMesh
             {
@@ -135,7 +143,8 @@ namespace Mono.Ecs
             EntityManager().AddComponentData(resourceEntityArchetype, new Resource
             {
                 IsMineral = resource == ResourcesReference.Resource.MineralField,
-                Available = true
+                Available = true,
+                uuid = resourceUuid
             });
 
             EntityManager().AddComponentData(resourceEntityArchetype, new Translation

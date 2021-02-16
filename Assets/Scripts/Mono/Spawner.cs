@@ -16,28 +16,28 @@ public class Spawner : MonoBehaviour
 
     private void MakeEntity()
     {
-        EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
-
-        EntityArchetype archetype = entityManager.CreateArchetype(
-            typeof(Translation),
-            typeof(Rotation),
-            typeof(RenderMesh),
-            typeof(RenderBounds),
-            typeof(LocalToWorld),
-            typeof(CopyTransformFromGameObject)
-        );
-
-        Entity myEntity = entityManager.CreateEntity(archetype);
-
-        entityManager.AddComponentData(myEntity, new Translation
-        {
-            Value = new float3(2f, 0f, 4f)
-        });
-
-        entityManager.AddSharedComponentData(myEntity, new RenderMesh
-        {
-            mesh = unitMesh,
-            material = unitMaterial
-        });
+        // EntityManager entityManager = World.DefaultGameObjectInjectionWorld.EntityManager;
+        //
+        // EntityArchetype archetype = entityManager.CreateArchetype(
+        //     typeof(Translation),
+        //     typeof(Rotation),
+        //     typeof(RenderMesh),
+        //     typeof(RenderBounds),
+        //     typeof(LocalToWorld),
+        //     typeof(CopyTransformFromGameObject)
+        // );
+        //
+        // Entity myEntity = entityManager.CreateEntity(archetype);
+        //
+        // entityManager.AddComponentData(myEntity, new Translation
+        // {
+        //     Value = new float3(2f, 0f, 4f)
+        // });
+        //
+        // entityManager.AddSharedComponentData(myEntity, new RenderMesh
+        // {
+        //     mesh = unitMesh,
+        //     material = unitMaterial
+        // });
     }
 }

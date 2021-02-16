@@ -2,13 +2,17 @@
 using ECS.Component;
 using Mono.Actor;
 using Mono.Element;
+using Mono.Entity;
 using Mono.Service;
 using Mono.Static;
 using Mono.Targeting;
+using Mono.UI;
 using Mono.Util;
 using Scriptable.Scripts;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.AI;
@@ -17,67 +21,88 @@ namespace ECS.System
 {
     public class UnitsSystemBase : SystemBase
     {
-        public struct MoveSelectionGroup
-        {
-            public List<int> selection;
-            public Vector3 destination;
-        }
+   
         
-        private MoveSelectionGroup moveSelectionGroup;
+        // private MoveSelectionGroup moveSelectionGroup;
         private bool MoveSelection = false;
+
+        private Vector3 startMousePos;
+        private Vector3 startMouseWorldPos;
+        
+        List<int> selection;
         protected override void OnCreate()
         {
             base.OnCreate();
 
-            SelectionService.OnSelectionMoveToPoint += (sender, ints) =>
-            {
-                moveSelectionGroup = ints;
-                
-                MoveSelection = true;
-            };
+            // SelectionService.OnSelectionMoveToPoint += (sender, ints) =>
+            // {
+            //    //  moveSelectionGroup = ints;
+            //     
+            //     MoveSelection = true;
+            // };
         }
 
         protected override void OnUpdate()
         {
             // L'unité récupère ses stats dans l'ElementManager
+
+            bool targetingMineral = false;
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (RaycastHoveredSystem.resourceHoveredUuid != -1)
+                {
+                    targetingMineral = true;
+
+                    Entities.ForEach((NavMeshAgent NavMeshAgent, ref Unit unit, ref Element element, ref Translation translation) =>
+                    {
+                        if (Selection.UuidSelection().Contains(element.uuid))
+                        {
+                            unit.ElementAction = ActorReference.ElementAction.MoveToResource;
+                            // go to minerai
+                            SetTargetPoint(RaycastHoveredSystem.resourceHoveredPos, ref unit, ref translation,
+                                NavMeshAgent);
+                        }
+                    }).WithoutBurst().Run();
+                }
+            }
             
             Entities.ForEach((NavMeshAgent navMeshAgent, ref Unit unit, ref Element element, ref Translation translation) =>
             {
-                
                 var unitScriptable = 
                     ElementManager.Singleton.GetElementScriptableForElement(element.element);
                 
                 // Si l'action en cours est une action de déplacement
-                if (ActorReference.IsMovingAction(unit.ElementAction))
-                {
-                    // on vérifie qu'on est pas bloqué par d'autres agents
-                    if (unit.stuckInTrigger)
-                    {
-                        unit.stuckInTriggerCount++;
-
-                        if (unit.stuckInTriggerCount > 200)
-                        {
-                            Release(ref unit); 
-                        
-                            // Debug.Log("Stuck");
-                            // TODO
-                            Vector3 diff = 
-                                (translation.Value - unit.OtherStuckTranslation.Value) * 2;
-                        
-                            Vector3 unitPos = new Vector3(translation.Value.x, translation.Value.y, translation.Value.z);
-                        
-                            SetTargetPoint(unitPos +  diff, ref unit, ref translation, navMeshAgent);
-                            // otherStuck.GetComponent<UnitBehaviour>().SetTargetPoint(otherStuck.transform.position - diff); // TODO
-                            // UnitManager.Singleton.SetTargetPointToOtherUnit(otherStuck, otherStuck.transform.position - diff);
-                        }
-
-                    }
-                    else
-                    {
-                        unit.stuckInTriggerCount = 0;
-                    }
-                
-                }
+                // if (ActorReference.IsMovingAction(unit.ElementAction))
+                // {
+                //     // on vérifie qu'on est pas bloqué par d'autres agents
+                //     if (unit.stuckInTrigger)
+                //     {
+                //         unit.stuckInTriggerCount++;
+                //
+                //         if (unit.stuckInTriggerCount > 200)
+                //         {
+                //             Release(ref unit); 
+                //         
+                //             // Debug.Log("Stuck");
+                //             // TODO
+                //             Vector3 diff = 
+                //                 (translation.Value - unit.otherStuckTranslation) * 2;
+                //         
+                //             Vector3 unitPos = new Vector3(translation.Value.x, translation.Value.y, translation.Value.z);
+                //         
+                //             SetTargetPoint(unitPos +  diff, ref unit, ref translation, navMeshAgent);
+                //             // otherStuck.GetComponent<UnitBehaviour>().SetTargetPoint(otherStuck.transform.position - diff); // TODO
+                //             // UnitManager.Singleton.SetTargetPointToOtherUnit(otherStuck, otherStuck.transform.position - diff);
+                //         }
+                //
+                //     }
+                //     else
+                //     {
+                //         unit.stuckInTriggerCount = 0;
+                //     }
+                //
+                // }
 
                 #region Actions
 
@@ -131,33 +156,24 @@ namespace ECS.System
                 #endregion
             
             }).WithoutBurst().Run();
-
-            if (Input.GetMouseButton(1))
+            
+            if (Input.GetMouseButtonDown(0))
             {
-                
-
+                startMousePos = Input.mousePosition;            
+                startMouseWorldPos = RaycastUtility.RaycastPosition();             
             }
-
-            if (MoveSelection)
-            {
-                // TODO Pass selection in a job to Burst
-                // Performances médiocres a cause de l'event
-                Entities.ForEach((NavMeshAgent nav, ref Unit unit, ref Element element, ref Translation translation) =>
-                {
-                    if (moveSelectionGroup.selection.Contains(element.uuid))
-                    {
-                        Release(ref unit);
-                        SetTargetPoint(moveSelectionGroup.destination,ref unit, ref translation, nav);
-                    }
-
-                    unit.ElementAction = ActorReference.ElementAction.MoveToPoint;
-                }).WithoutBurst().Run();
-
-                MoveSelection = false;
-            }
+            
+        }
+    
+        
+        bool InRectBounds(Vector3 min, Vector3 max, float3 pos)
+        {
+            if (pos.x > min.x && pos.x < max.x && pos.z > min.z && pos.z < max.z) return true;
+            return false;
         }
         
-        
+
+
         void OnTargetReachedNextState(ref Unit unit, ref Translation translation, NavMeshAgent navMeshAgent)
         {
             Vector3 newTargetPos = new Vector3();
@@ -171,8 +187,38 @@ namespace ECS.System
             {
                 case ActorReference.ElementAction.MoveToResource:
                     unit.ElementAction = ActorReference.ElementAction.BringBackResource;
-                    GameObject resource = ResourcesManager.Singleton.GetClosestResourceOfType(translation.Value); // on relache la ressource vers laquelle on est allés, qui est la ressource la plus proche
-                    ResourcesManager.Singleton.ReleaseResource(resource);
+                    // GameObject resource = ResourcesManager.Singleton.GetClosestResourceOfType(translation.Value); // on relache la ressource vers laquelle on est allés, qui est la ressource la plus proche
+                    // ResourcesManager.Singleton.ReleaseResource(resource);
+                    
+                    float distanceMins = Mathf.Infinity;
+                    
+                    float3 currentPoss = translation.Value;
+                    float3 closestPoss = new float3();
+                    
+                    int closestResourceUuids = -1;
+                    
+                    Entities.ForEach((ref Resource r, ref Translation t) =>
+                    {
+                        float currentDistance = math.distance(currentPoss, t.Value);
+
+                        if (currentDistance < distanceMins && !r.Available)
+                        {
+                            closestPoss = t.Value;
+                            distanceMins = currentDistance;
+                            closestResourceUuids = r.uuid;
+                            // rr = r;
+                            // r.Available = false;
+                        }
+                        
+                    }).WithoutBurst().Run();
+                    
+                    Entities.ForEach((ref Resource r, ref Translation t) =>
+                    {
+                        if (r.uuid == closestResourceUuids)
+                        {
+                            r.Available = true;
+                        }
+                    }).WithoutBurst().Run();
                     
                     newTarget =
                         ElementManager.Singleton.GetClosestElementOfType(ElementReference.Element.House,
@@ -188,13 +234,48 @@ namespace ECS.System
                 
                 case ActorReference.ElementAction.BringBackResource:
                     unit.ElementAction = ActorReference.ElementAction.MoveToResource;
-                    newTarget = ResourcesManager.Singleton.GetClosestAvaibleResourceOfType(translation.Value);
-                    newTargetPos = newTarget.transform.position;
-                    ResourcesManager.Singleton.AccaparateResource(newTarget);
+
+                    float distanceMin = Mathf.Infinity;
+
+                    float3 currentPos = translation.Value;
+                    float3 closestPos = new float3();
+                    
+                    // Resource rr = new Resource();
+
+                    int closestResourceUuid = -1;
+                    
+                    Entities.ForEach((ref Resource r, ref Translation t) =>
+                    {
+                        float currentDistance = math.distance(currentPos, t.Value);
+
+                        if (currentDistance < distanceMin && r.Available)
+                        {
+                            closestPos = t.Value;
+                            distanceMin = currentDistance;
+                            closestResourceUuid = r.uuid;
+                            // rr = r;
+                            // r.Available = false;
+                        }
+                        
+                    }).WithoutBurst().Run();
+                    
+                    Entities.ForEach((ref Resource r, ref Translation t) =>
+                    {
+                        if (r.uuid == closestResourceUuid)
+                        {
+                            r.Available = false;
+                        }
+                    }).WithoutBurst().Run();
+
+                    // rr.Available = false;
+                    
+                    // newTarget = ResourcesManager.Singleton.GetClosestAvaibleResourceOfType(translation.Value);
+                    newTargetPos = closestPos;
+                    // ResourcesManager.Singleton.AccaparateResource(newTarget);
                     ResourcesManager.Singleton.AddMineral(8);
                     
                     
-                    Debug.Log("Je retourne chercher du minerai");
+                    // Debug.Log("Je retourne chercher du minerai");
                     break;
                 
                 default:
@@ -216,7 +297,7 @@ namespace ECS.System
             
         }
         
-        public void SetTargetPoint(Vector3 p, ref Unit unit, ref Translation translation, NavMeshAgent navMeshAgent)
+        public static void SetTargetPoint(Vector3 p, ref Unit unit, ref Translation translation, NavMeshAgent navMeshAgent)
         {
             // soit le point p est sur le navmesh
 
