@@ -3,10 +3,12 @@ using Mono.Actor;
 using Mono.Element;
 using Scriptable.Scripts;
 using Unity.Entities;
+using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
 using UnityEngine.AI;
+using BoxCollider = UnityEngine.BoxCollider;
 
 namespace Mono.Ecs
 {
@@ -32,6 +34,7 @@ namespace Mono.Ecs
                 typeof(ECS.Component.Element),
                 typeof(NavMeshAgent),
                 typeof(Unit)
+                , typeof(PhysicsCollider)
             );
         }
         
@@ -91,6 +94,14 @@ namespace Mono.Ecs
                 mesh = elementScriptable.ghostBuildingMesh,
                 material = elementScriptable.elementMaterial
             });
+
+            // BoxCollider boxCollider = newElement.GetComponent<BoxCollider>();
+            
+
+            // EntityManager().AddComponentData(unit, new PhysicsCollider
+            // {
+            //     Value = boxCollider
+            // });
 
             EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshAgent>());
         }
