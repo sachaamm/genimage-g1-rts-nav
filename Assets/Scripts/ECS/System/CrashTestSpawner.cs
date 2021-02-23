@@ -1,4 +1,5 @@
 ﻿using ECS.Component;
+using ECS.System.Targeting;
 using Mono.Actor;
 using Mono.Element;
 using Unity.Collections;
@@ -34,7 +35,7 @@ namespace ECS.System
                 {
                     unit.ElementAction = ActorReference.ElementAction.MoveToResource;
                     
-                    UnitsSystemBase.SetTargetPoint(
+                    TargetingUtility.SetTargetPoint(
                         positions[(int)UnityEngine.Random.Range(0,positions.Length)].Value, ref unit, ref translation, navMeshAgent);
 
                 }).WithoutBurst().Run();

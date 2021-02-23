@@ -3,7 +3,7 @@ using Mono.Actor;
 using Mono.Element;
 using Scriptable.Scripts;
 using Unity.Entities;
-using Unity.Physics;
+// using Unity.Physics;
 using Unity.Rendering;
 using Unity.Transforms;
 using UnityEngine;
@@ -34,7 +34,7 @@ namespace Mono.Ecs
                 typeof(ECS.Component.Element),
                 typeof(NavMeshAgent),
                 typeof(Unit)
-                , typeof(PhysicsCollider)
+                // , typeof(PhysicsCollider)
             );
         }
         
