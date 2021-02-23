@@ -33,7 +33,8 @@ namespace Mono.Ecs
                 typeof(LocalToWorld),
                 typeof(ECS.Component.Element),
                 typeof(NavMeshAgent),
-                typeof(Unit)
+                typeof(Unit),
+                typeof(UnitTarget)
                 // , typeof(PhysicsCollider)
             );
         }

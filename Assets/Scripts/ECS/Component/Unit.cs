@@ -13,7 +13,7 @@ namespace ECS.Component
         // public int stuckUuid;
         // public float3 otherStuckTranslation;
         //
-        public float3 TargetPoint;
+        // public float3 TargetPoint;
         
         
         

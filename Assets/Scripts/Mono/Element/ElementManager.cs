@@ -116,10 +116,10 @@ namespace Mono.Element
             
             if (elementScriptable.GetType() == typeof(UnitScriptable))
             {
-                var agent = newElement.AddComponent<NavMeshAgent>();
-                agent.angularSpeed = 500000;
-                agent.speed *= 50;
-                agent.acceleration *= 50;
+                // var agent = newElement.AddComponent<NavMeshAgent>();
+                // agent.angularSpeed = 500000;
+                // agent.speed *= 50;
+                // agent.acceleration *= 50;
                 // agent.radius = 0.1f;
                 // agent.autoBraking = false;
                 

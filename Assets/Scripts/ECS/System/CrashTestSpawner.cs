@@ -35,8 +35,8 @@ namespace ECS.System
                 {
                     unit.ElementAction = ActorReference.ElementAction.MoveToResource;
                     
-                    TargetingUtility.SetTargetPoint(
-                        positions[(int)UnityEngine.Random.Range(0,positions.Length)].Value, ref unit, ref translation, navMeshAgent);
+                    // TargetingUtility.SetTargetPoint(
+                    //     positions[(int)UnityEngine.Random.Range(0,positions.Length)].Value, ref unit, ref translation, navMeshAgent);
 
                 }).WithoutBurst().Run();
 

@@ -23,7 +23,7 @@ namespace ECS.System.Targeting
             
             if (NavMesh.SamplePosition(position, out hit, 10000.0f, NavMesh.AllAreas))
             {
-                unit.TargetPoint = hit.position;
+                // unit.TargetPoint = hit.position; // BROKEN
             }
             else
             {
@@ -33,7 +33,8 @@ namespace ECS.System.Targeting
             if (ActorReference.IsMovingAction(unit.ElementAction))
             {
                 // si c'est une action de déplacement alors on va vers la cible
-                navMeshAgent.destination = unit.TargetPoint;
+                
+                // navMeshAgent.destination = unit.TargetPoint; // BROKEN
             }
             else
             {
