@@ -11,6 +11,7 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.AI;
 using NotImplementedException = System.NotImplementedException;
@@ -19,7 +20,7 @@ namespace ECS.System
 {
     public class UnitsSelectionSystem : ComponentSystem 
     {
-        private List<int> selectionUuids = new List<int>();
+        public static List<int> selectionUuids = new List<int>();
         private bool OnSelectionChanged = false;
         // private NativeArray<NavMeshAgent> test;
         
@@ -29,9 +30,30 @@ namespace ECS.System
             
             SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
             {
+                Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+                {
+                    if (selectionUuids.Contains(element.uuid))
+                    {
+                        agent.enabled = false;
+                        obstacle.enabled = true;
+                    }
+                });
+                
                 selectionUuids = uuidsSelections;
                 
+                Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+                {
+                    if (selectionUuids.Contains(element.uuid))
+                    {
+                        agent.enabled = true;
+                        obstacle.enabled = false;
+                    }
+                });
+                
                 OnSelectionChanged = true;
+                
+                
+                
             };
             
             SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
@@ -40,6 +62,11 @@ namespace ECS.System
             };
             
         }
+
+        // public static NativeArray<int> GetSelection()
+        // {
+        //     NativeArray<int> nativeSelection = new NativeArray<int>();
+        // }
 
         void AdaptMaterialToSelection()
         {
@@ -127,7 +154,7 @@ namespace ECS.System
 
             if (Input.GetMouseButtonDown(1))
             {
-                if (Input.GetKey(KeyCode.C))
+                if (!Input.GetKey(KeyCode.C))
                 {
                     float3 distanceToPoint = RaycastUtility.RaycastPosition();
                     Dictionary<int, float3> DistanceToCenter = new Dictionary<int, float3>();

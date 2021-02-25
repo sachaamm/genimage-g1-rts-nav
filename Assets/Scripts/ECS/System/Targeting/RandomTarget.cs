@@ -1,4 +1,5 @@
 ﻿using ECS.Component;
+using Mono.Actor;
 using Unity.Collections;
 using Unity.Entities;
 using Unity.Transforms;
@@ -18,9 +19,9 @@ namespace ECS.System.Targeting
 
                // var translations =  entityQuery.ToComponentDataArray<Translation>(Allocator.TempJob);
 
-                Entities.ForEach((NavMeshAgent agent, ref UnitTarget unitTarget) =>
+                Entities.ForEach((NavMeshAgent agent, ref Unit unit, ref UnitTarget unitTarget) =>
                 {
-                    
+                    unit.ElementAction = ActorReference.ElementAction.MoveToResource;
                     agent.SetDestination(unitTarget.TargetPoint);
                 }).WithoutBurst().Run();
 

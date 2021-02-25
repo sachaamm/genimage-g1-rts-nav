@@ -33,6 +33,7 @@ namespace Mono.Ecs
                 typeof(LocalToWorld),
                 typeof(ECS.Component.Element),
                 typeof(NavMeshAgent),
+                typeof(NavMeshObstacle),
                 typeof(Unit),
                 typeof(UnitTarget)
                 // , typeof(PhysicsCollider)
@@ -105,6 +106,7 @@ namespace Mono.Ecs
             // });
 
             EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshAgent>());
+            EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshObstacle>());
         }
 
         public static void InstantiateBuildingEntity(ElementReference.Element element, GameObject newElement)
