@@ -34,8 +34,8 @@ namespace ECS.System
                 {
                     if (selectionUuids.Contains(element.uuid))
                     {
-                        agent.enabled = false;
-                        obstacle.enabled = true;
+                        // agent.enabled = false;
+                        // obstacle.enabled = true;
                     }
                 });
                 
@@ -156,11 +156,14 @@ namespace ECS.System
             {
                 if (!Input.GetKey(KeyCode.C))
                 {
-                    float3 distanceToPoint = RaycastUtility.RaycastPosition();
-                    Dictionary<int, float3> DistanceToCenter = new Dictionary<int, float3>();
+                    float3 destinationPoint = RaycastUtility.RaycastPosition();
+                    Dictionary<int, float3> UnitsPositions = new Dictionary<int, float3>();
 
                     float3 groupCenter = new float3();
 
+                   
+                    
+                    
                     Entities.ForEach((ref Translation Translation, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
@@ -171,32 +174,63 @@ namespace ECS.System
 
                     groupCenter /= selectionUuids.Count;
 
+                    
+                    int gridX = (int)Mathf.Sqrt(selectionUuids.Count);
+                    float interval = 20;
+                    int posX = 0;
+                    int posZ = 0;
+                    
+
                     Entities.ForEach((ref Translation Translation, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
                         {
-                            DistanceToCenter.Add(element.uuid, Translation.Value - groupCenter);
-                        
+                            // MAINTAIN DISTANCES BETWEEN UNITS 
+                            // UnitsPositions.Add(element.uuid, Translation.Value - groupCenter);
+                            
+                            posZ = (posX - (posX % gridX)) / gridX;
+
+                            float3 destinationPointResult = destinationPoint
+                                            +new float3((int) ((posX%gridX) * interval), 0, (int) (posZ * interval));
+                            
+                            UnitsPositions.Add(element.uuid, new int3(destinationPointResult));
+                            posX++;
+                            // posX %= gridX;
+                            
+                            // Debug.Log("PosX ");
+
                             // agent.SetDestination();
                         }
                     });
+                    
+                    int priority = 0;
                 
                     Entities.ForEach((NavMeshAgent agent, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
                         {
-                            agent.SetDestination(distanceToPoint + DistanceToCenter[element.uuid]);
+                            // MAINTAIN DISTANCES BETWEEN UNITS 
+                            // agent.SetDestination(distanceToPoint + UnitsPositions[element.uuid]);
+                            agent.SetDestination(UnitsPositions[element.uuid]);
+                            // agent.avoidancePriority = priority;
+                            // priority++;
                         }
+                        
+                        
                     });
                 }
                 else
                 {
+                    int priority = 0;
+                    
                     Entities.ForEach((NavMeshAgent agent, ref Unit unit, ref Element element) =>
                         {
                             if (selectionUuids.Contains(element.uuid) && RaycastHoveredSystem.resourceHoveredUuid == -1)
                             {
                                 unit.ElementAction = ActorReference.ElementAction.MoveToPoint;
                                 agent.SetDestination(RaycastUtility.RaycastPosition());
+                                agent.avoidancePriority = priority;
+                                priority++;
                             }
                         });
                     
