@@ -43,6 +43,8 @@ using UnityEngine.UI;
 
         public Text mineralAmountText, gazAmountText;
 
+        public bool CreateResourcesOnBeginning = false;
+        
         private void Awake()
         {
             Singleton = this;
@@ -50,7 +52,7 @@ using UnityEngine.UI;
 
         void Start()
         {
-            CreateResources();
+            if(CreateResourcesOnBeginning) CreateResources();
         }
 
         public void AddMineral(int amount)

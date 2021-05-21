@@ -89,7 +89,7 @@ namespace Mono.Element
             populationAmountText.text = populationAmount + "/" + populationAmountMax;
         }
 
-        public GameObject InstantiateElement(ElementReference.Element element, Vector3 position)
+        public GameObject InstantiateElement(ElementReference.Element element, Vector3 position, byte teamIndex)
         {
             ElementScriptable elementScriptable = _elementDictionary[element];
             
@@ -130,7 +130,7 @@ namespace Mono.Element
                 var unitScriptable = elementScriptable as UnitScriptable;
                 populationAmount += unitScriptable.UnitPopulationCost;
 
-                EntityInstantiator.InstantiateUnitEntity(element, newElement);
+                EntityInstantiator.InstantiateUnitEntity(element, newElement, teamIndex);
             }
 
             if (elementScriptable.GetType() == typeof(BuildingScriptable))

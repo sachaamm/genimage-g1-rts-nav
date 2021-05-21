@@ -14,5 +14,5 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   Prefab: {fileID: 1788365772548029601, guid: b2b6879a7f444274498f673040c8c590, type: 3}
   mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
-  material: {fileID: 2100000, guid: 34fa8e80264e89b449747d17fdf36848, type: 2}
+  material: {fileID: 2100000, guid: c653c6f0114f249409e4a1b9259764e3, type: 2}
   Scale: 10

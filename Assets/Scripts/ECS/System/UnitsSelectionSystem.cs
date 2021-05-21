@@ -28,38 +28,38 @@ namespace ECS.System
         {
             base.OnCreate();
             
-            SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
-            {
-                Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
-                {
-                    if (selectionUuids.Contains(element.uuid))
-                    {
-                        // agent.enabled = false;
-                        // obstacle.enabled = true;
-                    }
-                });
-                
-                selectionUuids = uuidsSelections;
-                
-                Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
-                {
-                    if (selectionUuids.Contains(element.uuid))
-                    {
-                        agent.enabled = true;
-                        obstacle.enabled = false;
-                    }
-                });
-                
-                OnSelectionChanged = true;
-                
-                
-                
-            };
-            
-            SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
-            {
-                ApplyElementActionOnUnitSelection(ElementAction);
-            };
+            // SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
+            // {
+            //     Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+            //     {
+            //         if (selectionUuids.Contains(element.uuid))
+            //         {
+            //             // agent.enabled = false;
+            //             // obstacle.enabled = true;
+            //         }
+            //     });
+            //     
+            //     selectionUuids = uuidsSelections;
+            //     
+            //     Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+            //     {
+            //         if (selectionUuids.Contains(element.uuid))
+            //         {
+            //             agent.enabled = true;
+            //             obstacle.enabled = false;
+            //         }
+            //     });
+            //     
+            //     OnSelectionChanged = true;
+            //     
+            //     
+            //     
+            // };
+            //
+            // SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
+            // {
+            //     ApplyElementActionOnUnitSelection(ElementAction);
+            // };
             
         }
 
@@ -144,8 +144,16 @@ namespace ECS.System
             });
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+        }
+
         protected override void OnUpdate()
         {
+            Debug.Log("Updating Unit Selection System ... ");
+            
             if (OnSelectionChanged)
             {
                 AdaptMaterialToSelection();

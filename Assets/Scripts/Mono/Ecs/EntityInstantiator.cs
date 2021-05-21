@@ -20,7 +20,7 @@ namespace Mono.Ecs
         {
             return World.DefaultGameObjectInjectionWorld.EntityManager;
         }
-        
+
         #region EntityArchetype
 
         public static EntityArchetype UnitEntityArchetype()
@@ -39,7 +39,7 @@ namespace Mono.Ecs
                 // , typeof(PhysicsCollider)
             );
         }
-        
+
         static EntityArchetype BuildingEntityArchetype()
         {
             return EntityManager().CreateArchetype(
@@ -65,73 +65,102 @@ namespace Mono.Ecs
                 typeof(Resource)
             );
         }
-        
+
         #endregion
 
-        public static void InstantiateUnitEntity(ElementReference.Element element, GameObject newElement)
+        // public static void InstantiateUnitEntity(ElementReference.Element element, GameObject newElement, byte teamIndex)
+        // {
+        //     ElementScriptable elementScriptable =
+        //         ElementManager.Singleton.GetElementScriptableForElement(element);
+        //     
+        //     Unity.Entities.Entity unit = EntityManager().CreateEntity(UnitEntityArchetype());
+        //     
+        //     EntityManager().AddComponentData(unit, new Scale
+        //     {
+        //         Value = elementScriptable.scaling
+        //     });
+        //     
+        //     EntityManager().AddComponentData(unit, new ECS.Component.Element
+        //     {
+        //         element = element,
+        //         uuid = int.Parse(newElement.transform.name),
+        //         TeamIndex = teamIndex
+        //     });
+        //     
+        //     EntityManager().AddComponentData(unit, new Unit
+        //     {
+        //         ElementAction = ActorReference.ElementAction.None
+        //     });
+        //     
+        //     EntityManager().AddSharedComponentData(unit, new RenderMesh
+        //     {
+        //         mesh = elementScriptable.ghostBuildingMesh,
+        //         material = elementScriptable.elementMaterial
+        //     });
+        //
+        //     // BoxCollider boxCollider = newElement.GetComponent<BoxCollider>();
+        //     
+        //
+        //     // EntityManager().AddComponentData(unit, new PhysicsCollider
+        //     // {
+        //     //     Value = boxCollider
+        //     // });
+        //
+        //     EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshAgent>());
+        //     EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshObstacle>());
+        // }
+        public static void InstantiateUnitEntity(ElementReference.Element element, GameObject newElement,
+            byte teamIndex)
         {
-            ElementScriptable elementScriptable =
-                ElementManager.Singleton.GetElementScriptableForElement(element);
-            
-            Unity.Entities.Entity unit = EntityManager().CreateEntity(UnitEntityArchetype());
-            
-            EntityManager().AddComponentData(unit, new Scale
-            {
-                Value = elementScriptable.scaling
-            });
-            
-            EntityManager().AddComponentData(unit, new ECS.Component.Element
+            // GameObject toConvert = Instantiate(unitPrefab, pos, Quaternion.identity);
+
+            BlobAssetStore _blobAssetStore = new BlobAssetStore();
+            GameObjectConversionSettings settings =
+                GameObjectConversionSettings.FromWorld(World.DefaultGameObjectInjectionWorld, _blobAssetStore);
+            Unity.Entities.Entity _entity = GameObjectConversionUtility.ConvertGameObjectHierarchy(newElement, settings);
+            EntityManager em = World.DefaultGameObjectInjectionWorld.EntityManager;
+            em.AddComponentData(_entity, new ECS.Component.Element
             {
                 element = element,
-                uuid = int.Parse(newElement.transform.name)
+                uuid = int.Parse(newElement.transform.name),
+                TeamIndex = teamIndex
             });
-            
-            EntityManager().AddComponentData(unit, new Unit
+            em.AddComponentData(_entity, new Unit
             {
                 ElementAction = ActorReference.ElementAction.None
             });
-            
-            EntityManager().AddSharedComponentData(unit, new RenderMesh
-            {
-                mesh = elementScriptable.ghostBuildingMesh,
-                material = elementScriptable.elementMaterial
-            });
+                
+            em.AddComponentObject(_entity, newElement.GetComponent<NavMeshAgent>());
+            Destroy(newElement.GetComponent<MeshRenderer>());
+            Destroy(newElement.GetComponent<MeshFilter>());
 
-            // BoxCollider boxCollider = newElement.GetComponent<BoxCollider>();
-            
-
-            // EntityManager().AddComponentData(unit, new PhysicsCollider
-            // {
-            //     Value = boxCollider
-            // });
-
-            EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshAgent>());
-            EntityManager().AddComponentObject(unit, newElement.GetComponent<NavMeshObstacle>());
+            _blobAssetStore.Dispose();
         }
+
 
         public static void InstantiateBuildingEntity(ElementReference.Element element, GameObject newElement)
         {
             ElementScriptable elementScriptable =
                 ElementManager.Singleton.GetElementScriptableForElement(element);
-            
+
             Unity.Entities.Entity unit = EntityManager().CreateEntity(BuildingEntityArchetype());
-            
+
             EntityManager().AddComponentData(unit, new Translation
             {
                 Value = newElement.transform.position
             });
-            
+
             EntityManager().AddComponentData(unit, new Scale
             {
                 Value = elementScriptable.scaling
             });
-            
+
             EntityManager().AddComponentData(unit, new ECS.Component.Element
             {
                 element = element,
                 uuid = int.Parse(newElement.transform.name)
             });
-            
+
             EntityManager().AddSharedComponentData(unit, new RenderMesh
             {
                 mesh = elementScriptable.ghostBuildingMesh,
@@ -144,10 +173,10 @@ namespace Mono.Ecs
         public static void InstantiateResourceEntity(ResourcesReference.Resource resource, Vector3 pos)
         {
             ResourceScriptable resourceScriptable = ResourcesManager.Singleton.GetResourceScriptable(resource);
-            
+
             Unity.Entities.Entity resourceEntityArchetype = EntityManager().CreateEntity(ResourceEntityArchetype());
             resourceUuid++;
-            
+
             EntityManager().AddSharedComponentData(resourceEntityArchetype, new RenderMesh
             {
                 mesh = resourceScriptable.mesh,
@@ -165,12 +194,11 @@ namespace Mono.Ecs
             {
                 Value = pos
             });
-            
+
             EntityManager().AddComponentData(resourceEntityArchetype, new Scale
             {
                 Value = resourceScriptable.Scale
             });
-
 
 
             // EntityManager().AddComponentData()

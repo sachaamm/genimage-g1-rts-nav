@@ -27,7 +27,7 @@ using UnityEngine.AI;
 
             if (Input.GetKeyDown(KeyCode.O))
             {
-                foreach (var unit in GameObject.FindGameObjectsWithTag("Unit"))
+                foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Unit"))
                 {
                     NavMeshAgent agent = unit.GetComponent<NavMeshAgent>();
                     agent.SetDestination(RaycastUtility.RaycastPosition());
@@ -59,7 +59,7 @@ using UnityEngine.AI;
 
                 List<ActorReference.ElementWithAction> elementActions = ElementWithActionsFromSelection(unitsInRect);
                 
-                Debug.Log(unitsInRect.Count);
+                Debug.Log("Elements in rect : " + unitsInRect.Count);
                 
                 
                 // UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);

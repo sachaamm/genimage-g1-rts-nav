@@ -48,9 +48,9 @@ namespace ECS.System
                         if (Selection.UuidSelection().Contains(elements[i].uuid) &&
                             elements[i].element == _elementAndAction.Element)
                         {
-                            GameObject newUnit =
-                                ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker,
-                                    positions[i].Value);
+                            // GameObject newUnit =
+                            //     ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker,
+                            //         positions[i].Value);
                         }
                     }
                 }

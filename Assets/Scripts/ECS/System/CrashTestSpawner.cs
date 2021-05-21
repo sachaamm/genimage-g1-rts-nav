@@ -14,16 +14,40 @@ namespace ECS.System
 {
     public class CrashTestSpawner : ComponentSystem
     {
+        protected override void OnCreate()
+        {
+            base.OnCreate();
+            int spawnNb = 1;
+            for (int i = 0; i < spawnNb; i++)
+            {
+                ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, EnemyManager.RandomSpawnPos(20),0);
+            }
+        }
+
+   
         protected override void OnUpdate()
         {
-            if (Input.GetKey(KeyCode.S))
+            if (Input.GetKeyDown(KeyCode.S))
             {
-                ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, EnemyManager.RandomSpawnPos(20));
+                int spawnNb = 1;
+                for (int i = 0; i < spawnNb; i++)
+                {
+                    ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, EnemyManager.RandomSpawnPos(20),0);
+                }
+            }
+            
+            if (Input.GetKeyDown(KeyCode.D))
+            {
+                int spawnNb = 20;
+                for (int i = 0; i < spawnNb; i++)
+                {
+                    ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, EnemyManager.RandomSpawnPos(20),0);
+                }
             }
             
             if (Input.GetKey(KeyCode.H))
             {
-                ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, EnemyManager.RandomSpawnPos(20));
+                ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, EnemyManager.RandomSpawnPos(20),0);
             }
 
             if (Input.GetKeyDown(KeyCode.A))

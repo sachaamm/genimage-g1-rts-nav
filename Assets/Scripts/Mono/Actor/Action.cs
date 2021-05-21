@@ -134,7 +134,7 @@ public class Action : MonoBehaviour
                 ResourcesManager.Singleton.SpendGaz(buildingScriptable.gazCost);
 
                 // Je crée le batiment en question a cet endroit
-                ElementManager.Singleton.InstantiateElement(ElementPlacer.Singleton.elementTypeOfNewBuilding, mousePos);
+                ElementManager.Singleton.InstantiateElement(ElementPlacer.Singleton.elementTypeOfNewBuilding, mousePos,0);
                 ElementPlacer.Singleton.StopPrevizualition();
                 // je Reset l'action pour arrêter la prévisualisation du batiment à construire
                 ResetCurrentAction();
