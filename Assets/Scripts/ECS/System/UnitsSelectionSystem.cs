@@ -7,8 +7,12 @@ using Mono.Service;
 using Scriptable.Scripts;
 using Unity.Collections;
 using Unity.Entities;
+using Unity.Jobs;
+using Unity.Mathematics;
 using Unity.Rendering;
+using Unity.Transforms;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace ECS.System
 {
@@ -16,25 +20,20 @@ namespace ECS.System
     {
         private List<int> selectionUuids = new List<int>();
         private bool OnSelectionChanged = false;
+        // private NativeArray<NavMeshAgent> test;
         
         protected override void OnCreate()
         {
             base.OnCreate();
             
-            SelectionService.OnSelectionChanged += (object sender, List<string> uuidsSelections) =>
+            SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
             {
-                Debug.Log("selection changed");
-                selectionUuids = new List<int>();
-
-                foreach (var a in uuidsSelections)
-                {
-                    selectionUuids.Add(int.Parse(a));
-                }
+                selectionUuids = uuidsSelections;
                 
                 OnSelectionChanged = true;
             };
             
-            SelectionService.OnElementAction += (object sender, ActorReference.ElementAction ElementAction) =>
+            SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
             {
                 ApplyElementActionOnUnitSelection(ElementAction);
             };
@@ -97,21 +96,22 @@ namespace ECS.System
                 });
             }
             
-            elements.Dispose();
-            entities.Dispose();
+            
             entitiesInSelection.Dispose();
             elementsInSelection.Dispose();
             entitiesOutOfSelection.Dispose();
             elementsOutOfSelection.Dispose();
+            elements.Dispose();
+            entities.Dispose();
         }
         
-        void ApplyElementActionOnUnitSelection(ActorReference.ElementAction elementAction)
+        void ApplyElementActionOnUnitSelection(ActorReference.ElementAndAction elementAction)
         {
             Entities.ForEach((ref Element element, ref Unit unit) =>
             {
                 if (selectionUuids.Contains(element.uuid))
                 {
-                    unit.ElementAction = elementAction;
+                    unit.ElementAction = elementAction.ElementAction;
                 }
             });
         }
@@ -123,6 +123,60 @@ namespace ECS.System
                 AdaptMaterialToSelection();
                 OnSelectionChanged = false;
             }
+
+            if (Input.GetMouseButtonDown(1))
+            {
+                if (Input.GetKey(KeyCode.C))
+                {
+                    float3 distanceToPoint = RaycastUtility.RaycastPosition();
+                    Dictionary<int, float3> DistanceToCenter = new Dictionary<int, float3>();
+
+                    float3 groupCenter = new float3();
+
+                    Entities.ForEach((ref Translation Translation, ref Element element) =>
+                    {
+                        if (selectionUuids.Contains(element.uuid))
+                        {
+                            groupCenter += Translation.Value;
+                        }
+                    });
+
+                    groupCenter /= selectionUuids.Count;
+
+                    Entities.ForEach((ref Translation Translation, ref Element element) =>
+                    {
+                        if (selectionUuids.Contains(element.uuid))
+                        {
+                            DistanceToCenter.Add(element.uuid, Translation.Value - groupCenter);
+                        
+                            // agent.SetDestination();
+                        }
+                    });
+                
+                    Entities.ForEach((NavMeshAgent agent, ref Element element) =>
+                    {
+                        if (selectionUuids.Contains(element.uuid))
+                        {
+                            agent.SetDestination(distanceToPoint + DistanceToCenter[element.uuid]);
+                        }
+                    });
+                }
+                else
+                {
+                    Entities.ForEach((NavMeshAgent agent, ref Unit unit, ref Element element) =>
+                        {
+                            if (selectionUuids.Contains(element.uuid) && RaycastHoveredSystem.resourceHoveredUuid == -1)
+                            {
+                                unit.ElementAction = ActorReference.ElementAction.MoveToPoint;
+                                agent.SetDestination(RaycastUtility.RaycastPosition());
+                            }
+                        });
+                    
+                    
+                    
+                }
+            }
         }
+        
     }
 }

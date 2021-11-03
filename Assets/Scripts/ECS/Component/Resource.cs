@@ -6,5 +6,6 @@ namespace ECS.Component
     {
         public bool Available;
         public bool IsMineral;
+        public int uuid;
     }
 }

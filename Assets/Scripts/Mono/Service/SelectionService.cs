@@ -7,16 +7,16 @@ namespace Mono.Service
 {
     public class SelectionService
     {
-        public static EventHandler<List<string>> OnSelectionChanged;
-        public static EventHandler<ActorReference.ElementAction> OnElementAction;
+        public static EventHandler<List<int>> OnSelectionChanged;
+        public static EventHandler<ActorReference.ElementAndAction> OnElementAction;
         public static EventHandler<UnitsSystemBase.MoveSelectionGroup> OnSelectionMoveToPoint;
         
-        public static void SelectionChangedMessage(List<string> message)
+        public static void SelectionChangedMessage(List<int> message)
         {
             OnSelectionChanged?.Invoke(null, message);
         }
         
-        public static void ElementActionMessage(ActorReference.ElementAction message)
+        public static void ElementActionMessage(ActorReference.ElementAndAction message)
         {
             OnElementAction?.Invoke(null, message);
         }
