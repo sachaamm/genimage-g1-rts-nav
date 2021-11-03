@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using ECS.System;
 using Mono.Actor;
 
 namespace Mono.Service
@@ -9,7 +8,7 @@ namespace Mono.Service
     {
         public static EventHandler<List<int>> OnSelectionChanged;
         public static EventHandler<ActorReference.ElementAndAction> OnElementAction;
-        public static EventHandler<UnitsSystemBase.MoveSelectionGroup> OnSelectionMoveToPoint;
+        // public static EventHandler<UnitsSystemBase.MoveSelectionGroup> OnSelectionMoveToPoint;
         
         public static void SelectionChangedMessage(List<int> message)
         {
@@ -21,9 +20,9 @@ namespace Mono.Service
             OnElementAction?.Invoke(null, message);
         }
 
-        public static void SelectionMoveToPointMessage(UnitsSystemBase.MoveSelectionGroup message)
-        {
-            OnSelectionMoveToPoint?.Invoke(null, message);
-        }
+        // public static void SelectionMoveToPointMessage(UnitsSystemBase.MoveSelectionGroup message)
+        // {
+        //     OnSelectionMoveToPoint?.Invoke(null, message);
+        // }
     }
 }

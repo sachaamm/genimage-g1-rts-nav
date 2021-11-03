@@ -18,8 +18,8 @@ public class Game : MonoBehaviour
 
     void CreateTeam(Vector3 pos)
     {
-        ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, pos + new Vector3(0,0,0));
-        ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, pos + new Vector3(120,0,0));
+        //ElementManager.Singleton.InstantiateElement(ElementReference.Element.House, pos + new Vector3(0,0,0));
+        //ElementManager.Singleton.InstantiateElement(ElementReference.Element.Worker, pos + new Vector3(120,0,0));
     }
 
     // Update is called once per frame
@@ -28,3 +28,4 @@ public class Game : MonoBehaviour
         
     }
 }
+

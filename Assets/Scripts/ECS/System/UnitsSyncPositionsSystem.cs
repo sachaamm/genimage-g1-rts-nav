@@ -1,10 +1,13 @@
-﻿using Unity.Entities;
+﻿
+using Unity.Entities;
 using Unity.Transforms;
 using UnityEngine.AI;
 
+
 namespace ECS.System
 {
-    public class UnitsSyncPositionsSystem : SystemBase
+    
+    partial class UnitsSyncPositionsSystem : SystemBase
     {
         protected override void OnUpdate()
         {
@@ -13,5 +16,11 @@ namespace ECS.System
                 translation.Value = navMeshAgent.transform.position;
             }).WithoutBurst().Run();
         }
+    
+        // public UnitsSyncPositionsSystem(object @object, IntPtr method) : base(@object, method)
+        // {
+        //     
+        // }
     }
 }
+

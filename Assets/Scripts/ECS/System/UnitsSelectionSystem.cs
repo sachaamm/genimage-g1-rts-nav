@@ -11,14 +11,16 @@ using Unity.Jobs;
 using Unity.Mathematics;
 using Unity.Rendering;
 using Unity.Transforms;
+using UnityEditor.IMGUI.Controls;
 using UnityEngine;
 using UnityEngine.AI;
+using NotImplementedException = System.NotImplementedException;
 
 namespace ECS.System
 {
     public class UnitsSelectionSystem : ComponentSystem 
     {
-        private List<int> selectionUuids = new List<int>();
+        public static List<int> selectionUuids = new List<int>();
         private bool OnSelectionChanged = false;
         // private NativeArray<NavMeshAgent> test;
         
@@ -26,19 +28,45 @@ namespace ECS.System
         {
             base.OnCreate();
             
-            SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
-            {
-                selectionUuids = uuidsSelections;
-                
-                OnSelectionChanged = true;
-            };
-            
-            SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
-            {
-                ApplyElementActionOnUnitSelection(ElementAction);
-            };
+            // SelectionService.OnSelectionChanged += (object sender, List<int> uuidsSelections) =>
+            // {
+            //     Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+            //     {
+            //         if (selectionUuids.Contains(element.uuid))
+            //         {
+            //             // agent.enabled = false;
+            //             // obstacle.enabled = true;
+            //         }
+            //     });
+            //     
+            //     selectionUuids = uuidsSelections;
+            //     
+            //     Entities.ForEach((ref Element element, NavMeshObstacle obstacle, NavMeshAgent agent) =>
+            //     {
+            //         if (selectionUuids.Contains(element.uuid))
+            //         {
+            //             agent.enabled = true;
+            //             obstacle.enabled = false;
+            //         }
+            //     });
+            //     
+            //     OnSelectionChanged = true;
+            //     
+            //     
+            //     
+            // };
+            //
+            // SelectionService.OnElementAction += (object sender, ActorReference.ElementAndAction ElementAction) =>
+            // {
+            //     ApplyElementActionOnUnitSelection(ElementAction);
+            // };
             
         }
+
+        // public static NativeArray<int> GetSelection()
+        // {
+        //     NativeArray<int> nativeSelection = new NativeArray<int>();
+        // }
 
         void AdaptMaterialToSelection()
         {
@@ -116,8 +144,16 @@ namespace ECS.System
             });
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            
+        }
+
         protected override void OnUpdate()
         {
+            Debug.Log("Updating Unit Selection System ... ");
+            
             if (OnSelectionChanged)
             {
                 AdaptMaterialToSelection();
@@ -126,13 +162,16 @@ namespace ECS.System
 
             if (Input.GetMouseButtonDown(1))
             {
-                if (Input.GetKey(KeyCode.C))
+                if (!Input.GetKey(KeyCode.C))
                 {
-                    float3 distanceToPoint = RaycastUtility.RaycastPosition();
-                    Dictionary<int, float3> DistanceToCenter = new Dictionary<int, float3>();
+                    float3 destinationPoint = RaycastUtility.RaycastPosition();
+                    Dictionary<int, float3> UnitsPositions = new Dictionary<int, float3>();
 
                     float3 groupCenter = new float3();
 
+                   
+                    
+                    
                     Entities.ForEach((ref Translation Translation, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
@@ -143,32 +182,63 @@ namespace ECS.System
 
                     groupCenter /= selectionUuids.Count;
 
+                    
+                    int gridX = (int)Mathf.Sqrt(selectionUuids.Count);
+                    float interval = 20;
+                    int posX = 0;
+                    int posZ = 0;
+                    
+
                     Entities.ForEach((ref Translation Translation, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
                         {
-                            DistanceToCenter.Add(element.uuid, Translation.Value - groupCenter);
-                        
+                            // MAINTAIN DISTANCES BETWEEN UNITS 
+                            // UnitsPositions.Add(element.uuid, Translation.Value - groupCenter);
+                            
+                            posZ = (posX - (posX % gridX)) / gridX;
+
+                            float3 destinationPointResult = destinationPoint
+                                            +new float3((int) ((posX%gridX) * interval), 0, (int) (posZ * interval));
+                            
+                            UnitsPositions.Add(element.uuid, new int3(destinationPointResult));
+                            posX++;
+                            // posX %= gridX;
+                            
+                            // Debug.Log("PosX ");
+
                             // agent.SetDestination();
                         }
                     });
+                    
+                    int priority = 0;
                 
                     Entities.ForEach((NavMeshAgent agent, ref Element element) =>
                     {
                         if (selectionUuids.Contains(element.uuid))
                         {
-                            agent.SetDestination(distanceToPoint + DistanceToCenter[element.uuid]);
+                            // MAINTAIN DISTANCES BETWEEN UNITS 
+                            // agent.SetDestination(distanceToPoint + UnitsPositions[element.uuid]);
+                            agent.SetDestination(UnitsPositions[element.uuid]);
+                            // agent.avoidancePriority = priority;
+                            // priority++;
                         }
+                        
+                        
                     });
                 }
                 else
                 {
+                    int priority = 0;
+                    
                     Entities.ForEach((NavMeshAgent agent, ref Unit unit, ref Element element) =>
                         {
                             if (selectionUuids.Contains(element.uuid) && RaycastHoveredSystem.resourceHoveredUuid == -1)
                             {
                                 unit.ElementAction = ActorReference.ElementAction.MoveToPoint;
                                 agent.SetDestination(RaycastUtility.RaycastPosition());
+                                agent.avoidancePriority = priority;
+                                priority++;
                             }
                         });
                     

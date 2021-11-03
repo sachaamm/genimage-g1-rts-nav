@@ -119,7 +119,7 @@ namespace Scriptable.Scripts.Sets
                             (unit.transform.position - otherStuck.transform.position) * 2;
                         SetTargetPoint(unit.transform.position + diff);
                         // otherStuck.GetComponent<UnitBehaviour>().SetTargetPoint(otherStuck.transform.position - diff);
-                        UnitManager.Singleton.SetTargetPointToOtherUnit(otherStuck, otherStuck.transform.position - diff);
+                        // UnitManager.Singleton.SetTargetPointToOtherUnit(otherStuck, otherStuck.transform.position - diff);
                     }
 
                 }

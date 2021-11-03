@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using DefaultNamespace;
 using Mono.Ecs;
+// using Mono.Ecs;
 using Mono.Entity;
 using RotaryHeart.Lib.SerializableDictionary;
 using Scriptable.Scripts;
@@ -19,6 +20,7 @@ using UnityEngine.UI;
         [System.Serializable]
         public class ResourceDictionary : SerializableDictionaryBase<ResourcesReference.Resource, ResourceScriptable>
         {
+            
         }
 
         public static ResourcesManager Singleton;
@@ -41,6 +43,8 @@ using UnityEngine.UI;
 
         public Text mineralAmountText, gazAmountText;
 
+        public bool CreateResourcesOnBeginning = false;
+        
         private void Awake()
         {
             Singleton = this;
@@ -48,7 +52,7 @@ using UnityEngine.UI;
 
         void Start()
         {
-            CreateResources();
+            if(CreateResourcesOnBeginning) CreateResources();
         }
 
         public void AddMineral(int amount)
@@ -77,13 +81,16 @@ using UnityEngine.UI;
             gazAmountText.text = gazAmount.ToString();
         }
 
+        
+
         void CreateResources()
         {
             int nbResources = 100;
 
             for (int i = 0; i < nbResources; i++)
             {
-                EntityInstantiator.InstantiateResourceEntity(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
+                EntityInstantiator.InstantiateResourceEntity(ResourcesReference.Resource.MineralField, EnemyManager.RandomSpawnPos());
+                
                 // var r = InstantiateResource(ResourcesReference.Resource.MineralField, EnemyManager.Singleton.RandomSpawnPos());
                 // r.name = "Minerai " + i;
             }

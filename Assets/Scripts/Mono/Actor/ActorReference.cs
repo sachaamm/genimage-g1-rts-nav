@@ -20,14 +20,7 @@ namespace Mono.Actor
             SeekClosestResource,
             CreateUnit,
             CreateWorker,
-            CreateSoldier
-            
-        }
-        
-        public struct ElementAndAction
-        {
-            public ElementReference.Element Element;
-            public ElementAction ElementAction;
+            CreateSolider
         }
         
         
@@ -37,6 +30,19 @@ namespace Mono.Actor
             public ActorReference.ElementAction ElementAction;
             public List<int> ElementsForAction;
             public ElementReference.Element Element;
+        }
+
+        public struct ElementAndAction
+        {
+            public ElementReference.Element Element;
+            public ElementAction ElementAction;
+        }
+
+        public struct ElementAndActionCreateUnit
+        {
+            public ElementReference.Element Element;
+            public ElementAction ElementAction;
+            public ElementReference.Element UnitToCreate;
         }
 
         public class ElementWithActionCreateUnit : ElementWithAction

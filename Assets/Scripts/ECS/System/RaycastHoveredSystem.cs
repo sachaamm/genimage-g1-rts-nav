@@ -1,4 +1,4 @@
-﻿﻿using ECS.Component;
+﻿using ECS.Component;
 using Unity.Entities;
 using Unity.Mathematics;
 using Unity.Transforms;

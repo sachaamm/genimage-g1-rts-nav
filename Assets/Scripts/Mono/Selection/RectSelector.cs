@@ -6,6 +6,7 @@ using Mono.Element;
 using Mono.Service;
 using Scriptable.Scripts;
 using UnityEngine;
+using UnityEngine.AI;
 
 // Script permettant de réaliser une selection à partir d'un rectangle 
     public class RectSelector : MonoBehaviour
@@ -23,6 +24,15 @@ using UnityEngine;
         
         private void Update()
         {
+
+            if (Input.GetKeyDown(KeyCode.O))
+            {
+                foreach (GameObject unit in GameObject.FindGameObjectsWithTag("Unit"))
+                {
+                    NavMeshAgent agent = unit.GetComponent<NavMeshAgent>();
+                    agent.SetDestination(RaycastUtility.RaycastPosition());
+                }
+            }
 
             // Je commence la sélection quand j'enfonce le clique gauche
             if (Input.GetMouseButtonDown(0))
@@ -49,7 +59,7 @@ using UnityEngine;
 
                 List<ActorReference.ElementWithAction> elementActions = ElementWithActionsFromSelection(unitsInRect);
                 
-                Debug.Log(unitsInRect.Count);
+                Debug.Log("Elements in rect : " + unitsInRect.Count);
                 
                 
                 // UiManager.Singleton.UpdateActionsLayout(elementActions, unitsInRect);
